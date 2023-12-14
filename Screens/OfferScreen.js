@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   },
   button: {
     margin: 16,
-    backgroundColor: "orange",
+    backgroundColor: '#f26f55',
   },
   modalContainer: {
     backgroundColor: 'white',

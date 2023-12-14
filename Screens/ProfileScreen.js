@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#f26f55',
     borderRadius: 10,
+    backgroundColor: "#ffffff",
   },
   profilePicture: {
     width: 100,

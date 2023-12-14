@@ -41,12 +41,11 @@ const styles = StyleSheet.create({
   offerContainer: {
     backgroundColor: '#fff',
     borderColor: '#f26f55',
-    borderRadius: 2,
+    borderWidth: 2,
+    margin: 16,
   },
   contentContainer: {
     padding: 16,
-    borderColor: "orange",  // Change border color to orange
-    borderRadius: 2,
   },
   titleContainer: {
     flexDirection: 'row',

@@ -1,3 +1,4 @@
+//OfferItem.js
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Card, Title, Paragraph, IconButton, Modal, Portal, TextInput, Button } from 'react-native-paper';
@@ -103,12 +104,10 @@ const styles = StyleSheet.create({
     margin: 16,
     backgroundColor: '#fff',
     borderColor: '#f26f55',
-    borderRadius: 2,
+    borderWidth: 2,
   },
   contentContainer: {
     padding: 16,
-    borderColor: "orange",
-    borderRadius: 2,
   },
   titleContainer: {
     flexDirection: 'row',
