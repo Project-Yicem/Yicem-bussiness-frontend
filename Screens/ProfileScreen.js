@@ -1,20 +1,29 @@
 // ProfileScreen.js
-import React from 'react';
-import { View, Image, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { Button } from 'react-native-paper';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import ProfileInfoCard from '../Components/ProfileInfoCard';
+import React from "react";
+import {
+  View,
+  Image,
+  StyleSheet,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import { Button } from "react-native-paper";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import ProfileInfoCard from "../Components/ProfileInfoCard";
 
 const ProfileScreen = () => {
   // Mock business information
   const businessInfo = {
-    name: 'Your Business Name',
-    email: 'business@example.com',
-    password: '********', // Masked password
-    phoneNumber: '+1234567890',
-    address: '123 Business Street, City, Country',
+    name: "Your Business Name",
+    email: "business@example.com",
+    password: "********", // Masked password
+    phoneNumber: "+1234567890",
+    address: "123 Business Street, City, Country",
     // You can replace the image source with the actual path or URL of the profile picture
-    profilePicture: require('../assets/businesslogos/logo_bakery.png'),
+    profilePicture: require("../assets/businesslogos/logo_bakery.png"),
+    openingTime: "08.00",
+    closingTime: "17.00",
   };
 
   const handleEditSave = (field, editedInfo) => {
@@ -25,7 +34,7 @@ const ProfileScreen = () => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
       <ScrollView>
@@ -61,12 +70,45 @@ const ProfileScreen = () => {
             onEditSave={handleEditSave}
           />
           <ProfileInfoCard
+            title="Open Hours"
+            info={{
+              openingTime: businessInfo.openingTime,
+              closingTime: businessInfo.closingTime,
+            }}
+            isEditable={true}
+            onEditSave={handleEditSave}
+            isTimeRange={true}
+          />
+          <ProfileInfoCard
             title="Profile Picture"
             isProfilePicture={true}
             info={businessInfo.profilePicture}
             isEditable={true}
             onEditSave={handleEditSave}
           />
+        </View>
+        <View style={styles.buttonContainer}>
+          <Button
+            icon={() => <Ionicons name="log-out" size={24} color="white" />}
+            onPress={() => {
+              // Handle logout logic
+              console.log("Logged out");
+            }}
+            mode="contained"
+          >
+            Log Out
+          </Button>
+          <Button
+            mode="contained"
+            buttonColor="teal"
+            icon={() => <Ionicons name="map" size={24} color="white" />}
+            onPress={() => {
+              // Handle map location upload logic
+              console.log("Upload Map Location");
+            }}
+          >
+            Edit Map Location
+          </Button>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -81,7 +123,7 @@ const styles = StyleSheet.create({
     padding: 16,
     margin: 16,
     borderWidth: 2,
-    borderColor: '#f26f55',
+    borderColor: "#f26f55",
     borderRadius: 10,
     backgroundColor: "#ffffff",
   },
@@ -89,11 +131,17 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    alignSelf: 'center',
+    alignSelf: "center",
     marginBottom: 16,
   },
   editButton: {
     marginTop: 16,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingBottom: 16,
   },
 });
 

@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TextInput } from 'react-native';
-import { IconButton, Button } from 'react-native-paper';
+import React, { useState } from "react";
+import { View, Text, StyleSheet, Image, TextInput } from "react-native";
+import { IconButton, Button } from "react-native-paper";
 
-const ProfileInfoCard = ({ title, info, isProfilePicture, onEditSave }) => {
+const ProfileInfoCard = ({
+  title,
+  info,
+  isProfilePicture,
+  onEditSave,
+  isTimeRange,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedInfo, setEditedInfo] = useState(info);
 
@@ -22,6 +28,27 @@ const ProfileInfoCard = ({ title, info, isProfilePicture, onEditSave }) => {
         {isProfilePicture ? (
           <View style={styles.profilePictureContainer}>
             <Image source={info} style={styles.profilePicture} />
+          </View>
+        ) : isTimeRange ? (
+          <View style={styles.editableText}>
+            <Text>Opening Time</Text>
+            <TextInput
+              value={editedInfo.openingTime}
+              onChangeText={(text) =>
+                setEditedInfo({ ...editedInfo, openingTime: text })
+              }
+              editable={isEditing}
+              style={styles.editableText}
+            />
+            <Text>Closing Time</Text>
+            <TextInput
+              value={editedInfo.closingTime}
+              onChangeText={(text) =>
+                setEditedInfo({ ...editedInfo, closingTime: text })
+              }
+              editable={isEditing}
+              style={styles.editableText}
+            />
           </View>
         ) : (
           <TextInput
@@ -59,9 +86,9 @@ const ProfileInfoCard = ({ title, info, isProfilePicture, onEditSave }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: 16,
   },
   infoContainer: {
@@ -69,13 +96,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 4,
   },
   editableText: {
     fontSize: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: "#E0E0E0",
   },
   profilePictureContainer: {
     marginTop: 8,
@@ -89,15 +116,15 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   saveButton: {
     marginLeft: 8,
   },
   line: {
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: "#E0E0E0",
   },
 });
 

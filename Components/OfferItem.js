@@ -1,17 +1,42 @@
 //OfferItem.js
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Card, Title, Paragraph, IconButton, Modal, Portal, TextInput, Button } from 'react-native-paper';
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  Card,
+  Title,
+  Paragraph,
+  IconButton,
+  Modal,
+  Portal,
+  TextInput,
+  Checkbox,
+  Button,
+} from "react-native-paper";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
-export default function OfferItem({ title, description, price, itemsLeft, totalItems, onEditPress, onMarkSoldPress }) {
-  const [isModalVisible, setModalVisible] = useState(false);
-
+export default function OfferItem({
+  title,
+  description,
+  price,
+  itemsLeft,
+  totalItems,
+  pickupTimes,
+  onEditPress,
+  reservations,
+  onReservationsPress,
+}) {
+  const [isEditModalVisible, setEditModalVisible] = useState(false);
+  const [isReservationsModalVisible, setReservationsModalVisible] =
+    useState(false);
   const [editedTitle, setEditedTitle] = useState(title);
   const [editedDescription, setEditedDescription] = useState(description);
   const [editedPrice, setEditedPrice] = useState(price);
-  
-  const showModal = () => setModalVisible(true);
-  const hideModal = () => setModalVisible(false);
+  const [confirmDeleteModal, setConfirmDeleteModal] = useState(false);
+
+  const showEditModal = () => setEditModalVisible(true);
+  const hideEditModal = () => setEditModalVisible(false);
+  const showReservationsModal = () => setReservationsModalVisible(true);
+  const hideReservationsModal = () => setReservationsModalVisible(false);
 
   // Separate state variables to hold edited values temporarily
   const [tempTitle, setTempTitle] = useState(title);
@@ -20,7 +45,7 @@ export default function OfferItem({ title, description, price, itemsLeft, totalI
 
   const handleSaveChanges = () => {
     // Implement logic to save changes, update the data, etc.
-    console.log('Changes saved:', { tempTitle, tempDescription, tempPrice });
+    console.log("Changes saved:", { tempTitle, tempDescription, tempPrice });
 
     // Update the main state with the edited values
     setEditedTitle(tempTitle);
@@ -28,18 +53,17 @@ export default function OfferItem({ title, description, price, itemsLeft, totalI
     setEditedPrice(tempPrice);
 
     // Close the modal
-    hideModal();
+    hideEditModal();
   };
 
   const handleDismiss = () => {
-
     // Reset temp values
     setTempTitle(editedTitle);
     setTempDescription(editedDescription);
     setTempPrice(editedPrice);
 
     // Close the modal
-    hideModal();
+    hideEditModal();
   };
 
   return (
@@ -48,26 +72,36 @@ export default function OfferItem({ title, description, price, itemsLeft, totalI
         {/* Title and Edit Icon */}
         <View style={styles.titleContainer}>
           <Title style={styles.title}>{editedTitle}</Title>
-          <TouchableOpacity onPress={showModal}>
+          <TouchableOpacity onPress={showEditModal}>
             <IconButton icon="pencil" size={20} />
           </TouchableOpacity>
         </View>
-
         {/* Description */}
         <Paragraph style={styles.description}>{editedDescription}</Paragraph>
-
-        {/* Price, Mark as Sold Button, Items Left */}
+        {/* Pickup Times */}
+        <Text style={{ color: "gray", fontStyle: "italic" }}>
+          Pickup Times:
+        </Text>
+        <Paragraph
+          style={{ color: "gray", fontStyle: "italic", marginBottom: 10 }}
+        >
+          {pickupTimes.map((time) => `${time}, `)}
+        </Paragraph>
+        {/* Price, Reservations button, Items Left */}
         <View style={styles.bottomContainer}>
           <Text style={styles.price}>{editedPrice}</Text>
-          <TouchableOpacity onPress={onMarkSoldPress}>
-            <Text style={styles.markAsSoldButton}>Mark as Sold</Text>
+          <TouchableOpacity onPress={onReservationsPress}>
+            <Button onPress={showReservationsModal}>Reservations</Button>
           </TouchableOpacity>
-          <Text style={styles.itemsLeft}>{`${itemsLeft}/${totalItems}`}</Text>
+          <Text style={styles.itemsLeft}>{`${itemsLeft} items left`}</Text>
         </View>
-
         {/* Modal for Editing */}
         <Portal>
-          <Modal visible={isModalVisible} onDismiss={handleDismiss} contentContainerStyle={styles.modalContainer}>
+          <Modal
+            visible={isEditModalVisible}
+            onDismiss={handleDismiss}
+            contentContainerStyle={styles.modalContainer}
+          >
             <TextInput
               label="Edit Title"
               value={tempTitle}
@@ -89,9 +123,70 @@ export default function OfferItem({ title, description, price, itemsLeft, totalI
               mode="outlined"
               style={styles.input}
             />
-            <Button onPress={handleSaveChanges} mode="contained" >
+            <Button onPress={handleSaveChanges} mode="contained">
               Save
             </Button>
+            <Button
+              onPress={() => {
+                setConfirmDeleteModal(true);
+              }}
+              mode="outlined"
+              style={{ marginTop: 10 }}
+              icon={() => (
+                <Ionicons name="trash" size={24} color={"darkorange"} />
+              )}
+            >
+              Delete Offer
+            </Button>
+          </Modal>
+          {/* Modal for Confirming Delete*/}
+          <Modal
+            visible={confirmDeleteModal}
+            onDismiss={() => setConfirmDeleteModal(false)}
+            contentContainerStyle={styles.modalContainer}
+          >
+            <Text>Are you sure you want to delete this offer?</Text>
+            <Button
+              onPress={() => {
+                console.log("Offer deleted");
+                setConfirmDeleteModal(false);
+              }}
+              mode="contained"
+              buttonColor="red"
+              style={{ marginTop: 20 }}
+              icon={() => <Ionicons name="trash" size={24} color="white" />}
+            >
+              Confirm
+            </Button>
+            <Button
+              onPress={() => setConfirmDeleteModal(false)}
+              mode="outlined"
+              style={{ marginTop: 10 }}
+            >
+              Cancel
+            </Button>
+          </Modal>
+          {/* Modal for Reservations */}
+          <Modal
+            visible={isReservationsModalVisible}
+            onDismiss={hideReservationsModal}
+            contentContainerStyle={styles.modalContainer}
+          >
+            <Title style={styles.modalTitle}>Reservations</Title>
+            {reservations.map((reservation) => (
+              <View key={reservation.id} style={styles.reservationContainer}>
+                <View style={styles.reservationInfo}>
+                  <Text>{reservation.name}</Text>
+                  <Text>{reservation.pickupTime}</Text>
+                </View>
+                <Checkbox
+                  status={reservation.isSold ? "checked" : "unchecked"}
+                  onValueChange={() => {
+                    // Implement logic to toggle the isSold status of the reservation
+                  }}
+                />
+              </View>
+            ))}
           </Modal>
         </Portal>
       </Card.Content>
@@ -102,35 +197,35 @@ export default function OfferItem({ title, description, price, itemsLeft, totalI
 const styles = StyleSheet.create({
   offerContainer: {
     margin: 16,
-    backgroundColor: '#fff',
-    borderColor: '#f26f55',
+    backgroundColor: "#fff",
+    borderColor: "#f26f55",
     borderWidth: 2,
   },
   contentContainer: {
     padding: 16,
   },
   titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   description: {
     marginBottom: 8,
   },
   bottomContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   price: {
     fontSize: 16,
   },
   markAsSoldButton: {
-    backgroundColor: '#f26f55',
+    backgroundColor: "#f26f55",
     fontSize: 16,
     color: "#ffffff",
   },
@@ -138,7 +233,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   modalContainer: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 20,
     margin: 16,
     borderRadius: 8,
@@ -148,6 +243,20 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     marginTop: 10,
+  },
+  reservationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 8,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: "lightgray",
+    borderRadius: 5,
+  },
+  reservationInfo: {
+    flex: 1,
+    marginRight: 8,
   },
 });
 
@@ -304,7 +413,7 @@ const styles = StyleSheet.create({
 //             <IconButton icon="pencil" size={20} onPress={onEditPress} />
 //           </TouchableOpacity>
 //         </View>
-        
+
 //         {/* Description */}
 //         <Paragraph style={styles.description}>{description}</Paragraph>
 
