@@ -1,16 +1,48 @@
 import React, { useState } from 'react';
 import { SafeAreaView, View, StyleSheet, Image } from 'react-native';
-import { TextInput, Button, Text } from 'react-native-paper';
+import { 
+  TextInput, 
+  Button, 
+  Text, 
+  Snackbar,
+  ActivityIndicator, 
+} from 'react-native-paper';
 import styles, { theme } from '../Styles/styles';
+import axios from "axios";
+import * as SecureStore from "expo-secure-store";
+import { IP_ADDRESS } from "../Functions/GetIP";
 
 const logoImg = require('../assets/logo.png');
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showLoginFailed, setShowLoginFailed] = useState(false);
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
 
-  const handleLogin = () => {
-    console.log(`Login pressed with email: ${email} and password: ${password}`);
+  const handleLogin = async () => {
+    const apiUrl = `http://${IP_ADDRESS}:8080/api/auth/signin`;
+
+    try {
+      setIsLoginLoading(true);
+      console.log("Logging in with username: ", email);
+      console.log("Sending request to ", apiUrl);
+      const response = await axios.post(apiUrl, {
+        username: email,
+        password: password,
+      });
+      console.log(response);
+      const token = response.data.token;
+      const userID = response.data.id;
+      // Store the token using expo-secure-store
+      await SecureStore.setItemAsync("userToken", token);
+      await SecureStore.setItemAsync("userID", userID);
+      setIsLoginLoading(false);
+      navigation.navigate("MainHome");
+    } catch (error) {
+      setShowLoginFailed(true);
+      setIsLoginLoading(false);
+    }
   };
 
   return (
@@ -31,7 +63,7 @@ export default function LoginScreen({ navigation }) {
         mode="outlined"
         style={styles.input}
       />
-      <Button mode="contained" onPress={() => {handleLogin(); navigation.navigate("MainHome")}} style={styles.button}>
+      <Button mode="contained" onPress={() => {handleLogin();}} style={styles.button} disabled={isLoginLoading}>
         Login
       </Button>
       <Text style={styles.signupText} >
@@ -40,6 +72,16 @@ export default function LoginScreen({ navigation }) {
       <Button mode="contained" onPress={() => navigation.navigate('Register')} style={styles.hollowButton}> 
         Create Registration Request
       </Button>
+
+      {/*Login failed, show a snackbar*/}
+      <Snackbar
+        visible={showLoginFailed}
+        onDismiss={() => setShowLoginFailed(false)}
+        onIconPress={() => setShowLoginFailed(false)}
+        duration={Snackbar.LENGTH_SHORT}
+      >
+        Login failed. Please try again.
+      </Snackbar>
     </SafeAreaView>
   );
 }

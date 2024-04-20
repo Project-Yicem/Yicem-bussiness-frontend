@@ -1,5 +1,5 @@
 // ProfileScreen.js
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Image,

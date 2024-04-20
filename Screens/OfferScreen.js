@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import {
   Button,
@@ -10,7 +10,52 @@ import {
 } from "react-native-paper";
 import OfferItem from "../Components/OfferItem";
 
+//API
+import axios from "axios";
+import * as SecureStore from "expo-secure-store";
+import { IP_ADDRESS } from "../Functions/GetIP";
+
 export default function OffersScreen({ navigation }) {
+  const [isOffersLoading, setIsOffersLoading] = useState(false);
+  const [offers, setOffers] = useState([]);
+
+  //Fetch offers
+  const fetchOffers = async () => {
+    try {
+      setIsOffersLoading(true);
+
+      const userToken = await SecureStore.getItemAsync("userToken");
+      const userID = await SecureStore.getItemAsync("userID");
+      console.log(userID);
+      const apiUrl = `http://${IP_ADDRESS}:8080/api/seller/${userID}/offers`;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userToken}`
+        }
+      };
+      const response = await axios.get(apiUrl, config);
+      console.log(response);
+      setOffers(response.data);
+      setIsOffersLoading(false);
+
+      // Add an arbitrary "isOpen" attribute to each business
+      // TODO This is temporary!!! This should be handled by the backend
+      // const updatedBusinesses = response.data.map((business) => {
+      //   business.isOpen = true;
+      //   return business;
+      // });
+      // setBusinesses(updatedBusinesses);
+    } catch (error) {
+      console.error("Error fetching businesses data:", error);
+      setIsOffersLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOffers();
+  }, []);
+
+
   const [dummyOffers, setDummyOffers] = useState([
     {
       id: "1",
@@ -153,11 +198,15 @@ export default function OffersScreen({ navigation }) {
       price: newPrice,
       itemsLeft: parseInt(newTotalItems) || 0,
       pickupTimes: selectedPickupTimes,
+      reservations: []
     };
 
     console.log("Changes saved:", newOffer);
 
     setDummyOffers((prevOffers) => [...prevOffers, newOffer]);
+
+    console.log(dummyOffers);
+
 
     setNewTitle("");
     setNewDescription("");
@@ -167,10 +216,64 @@ export default function OffersScreen({ navigation }) {
     hideModal();
   };
 
+  //add offers
+  const addOffer = async () => {
+    try {
+      setIsOffersLoading(true);
+
+      const userToken = await SecureStore.getItemAsync("userToken");
+      const userID = await SecureStore.getItemAsync("userID");
+      console.log(userID);
+      const apiUrl = `http://${IP_ADDRESS}:8080/api/seller/${userID}/addOffer`;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userToken}`
+        }
+      };
+      const response = await 
+      axios.post(apiUrl, {
+        offerName: newTitle,
+        description: newDescription,
+        price: newPrice,
+        itemCount: newTotalItems,
+        reserved: true
+      }, config).then((response) => {
+        console.log("offer adding successful");
+        //setIsOffersLoading(false);
+        //setSuccessVisible(true);
+        fetchOffers();
+      });
+      // Add an arbitrary "isOpen" attribute to each business
+      // TODO This is temporary!!! This should be handled by the backend
+      // const updatedBusinesses = response.data.map((business) => {
+      //   business.isOpen = true;
+      //   return business;
+      // });
+      // setBusinesses(updatedBusinesses);
+    } catch (error) {
+      console.error("Error adding offers:", error);
+      setIsOffersLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView>
       <ScrollView>
-        {dummyOffers.map((item) => (
+      {offers.map((item) => (
+          <OfferItem
+            key={item.id}
+            title={item.offerName}
+            description={item.description}
+            price={item.price}
+            itemsLeft={item.itemCount}
+            totalItems={item.totalItems}
+            pickupTimes=  {[]}//{item.pickupTimes}
+            reservations={item.reservations}
+            onEditPress={() => handleEditPress(item.id)}
+            onReservationsPress={() => handleReservationsPress(item.id)}
+          />
+        ))}
+        {/* {dummyOffers.map((item) => (
           <OfferItem
             key={item.id}
             title={item.title}
@@ -183,7 +286,7 @@ export default function OffersScreen({ navigation }) {
             onEditPress={() => handleEditPress(item.id)}
             onReservationsPress={() => handleReservationsPress(item.id)}
           />
-        ))}
+        ))} */}
         <Button
           icon="plus"
           mode="contained"
@@ -251,7 +354,7 @@ export default function OffersScreen({ navigation }) {
             ))}
           </ScrollView>
           <Button
-            onPress={handleSaveChanges}
+            onPress={addOffer/*handleSaveChanges*/}
             mode="contained"
             style={styles.button}
           >

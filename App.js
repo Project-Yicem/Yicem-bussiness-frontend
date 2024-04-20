@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, {useEffect} from 'react';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
@@ -12,36 +12,59 @@ import OffersScreen from './Screens/OfferScreen';
 import HistoryScreen from './Screens/HistoryScreen';
 import ProfileScreen from './Screens/ProfileScreen';
 import MainTabs from './MainTabs';
+import * as SecureStore from "expo-secure-store";
+import axios from "axios";
+import { IP_ADDRESS } from "./Functions/GetIP";
 
 import styles, { theme } from './Styles/styles';
 
 const Stack = createNativeStackNavigator();
-// const Tab = createBottomTabNavigator();
-
-// const MainTabs = () => (
-//   <Tab.Navigator>
-//     <Tab.Screen name="Offers" component={OffersScreen} />
-//     <Tab.Screen name="History" component={HistoryScreen} />
-//     <Tab.Screen name="Profile" component={ProfileScreen} />
-//   </Tab.Navigator>
-// );
 
 export default function App() {
   return (
     <PaperProvider theme={theme}>
       <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Register" component={RegisterScreen} />
-          <Stack.Screen name="Waiting" component={WaitingScreen} />
-          <Stack.Screen name="MainHome" component={MainTabs} />
-        </Stack.Navigator>
+        <AppContent />
       </NavigationContainer>
     </PaperProvider>
+  );
+}
+
+function AppContent(){
+  const navigation = useNavigation();
+
+  const checkToken = async () => {
+    // (if needed, uncomment this to delete token)
+    // await SecureStore.deleteItemAsync("userToken");
+
+    // Check if the user is already logged in
+    // If so, navigate to the MainHome screen
+    // If not, navigate to the Login screen
+    const userToken = await SecureStore.getItemAsync("userToken");          //PRONE TO FAIL
+    if (userToken) {
+      console.log(userToken);
+      navigation.navigate("MainHome");
+    } else {
+      navigation.navigate("Login");
+    }
+  };
+
+  useEffect(() => {
+    console.log("App loaded");
+
+    checkToken();
+  }, []);
+  return(
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="Waiting" component={WaitingScreen} />
+      <Stack.Screen name="MainHome" component={MainTabs} />
+    </Stack.Navigator>
   );
 }
 

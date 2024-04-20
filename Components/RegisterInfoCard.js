@@ -2,29 +2,15 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Image, TextInput } from "react-native";
 import { IconButton, Button } from "react-native-paper";
 
-const ProfileInfoCard = ({
+const RegisterInfoCard = ({
   title,
   info,
   isProfilePicture,
   onEditSave,
   isTimeRange,
 }) => {
-  const [isEditing, setIsEditing] = useState(false);
   const [editedInfo, setEditedInfo] = useState(info);
-
-  const handleEditPress = () => {
-    setIsEditing(true);
-  };
-
-  const handleSavePress = () => {
-    onEditSave(title, editedInfo);
-    setIsEditing(false);
-  };
-
-  const handleCancelPress = () => {
-    setEditedInfo(info);
-    setIsEditing(false);
-  }
+  
   return (
     <View style={styles.container}>
       <View style={styles.infoContainer}>
@@ -41,7 +27,6 @@ const ProfileInfoCard = ({
               onChangeText={(text) =>
                 setEditedInfo({ ...editedInfo, openingTime: text })
               }
-              editable={isEditing}
               style={styles.editableText}
             />
             <Text>Closing Time</Text>
@@ -50,7 +35,6 @@ const ProfileInfoCard = ({
               onChangeText={(text) =>
                 setEditedInfo({ ...editedInfo, closingTime: text })
               }
-              editable={isEditing}
               style={styles.editableText}
             />
           </View>
@@ -58,39 +42,11 @@ const ProfileInfoCard = ({
           <TextInput
             value={editedInfo}
             onChangeText={setEditedInfo}
-            editable={isEditing}
             style={styles.editableText}
           />
         )}
       </View>
       <View style={styles.buttonContainer}>
-        {!isProfilePicture && !isEditing &&(
-          <IconButton
-            icon="pencil"
-            size={24}
-            color="#000000"
-            style={styles.editIcon}
-            onPress={handleEditPress}
-          />
-        )}
-         {!isProfilePicture && isEditing && (
-          <IconButton
-            icon="close"
-            size={24}
-            color="#ff0000"
-            style={styles.editIcon}
-            onPress={handleCancelPress}
-          />
-        )}
-        {isEditing && (
-          <Button
-            mode="contained"
-            onPress={handleSavePress}
-            style={styles.saveButton}
-          >
-            Save
-          </Button>
-        )}
       </View>
       <View style={styles.line} />
     </View>
@@ -141,4 +97,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileInfoCard;
+export default RegisterInfoCard;
