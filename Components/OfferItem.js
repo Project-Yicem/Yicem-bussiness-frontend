@@ -11,10 +11,18 @@ import {
   TextInput,
   Checkbox,
   Button,
+  Snackbar,
 } from "react-native-paper";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
+//API
+import axios from "axios";
+import * as SecureStore from "expo-secure-store";
+import { IP_ADDRESS } from "../Functions/GetIP";
+
 export default function OfferItem({
+  key,
+  id,
   title,
   description,
   price,
@@ -24,6 +32,7 @@ export default function OfferItem({
   onEditPress,
   reservations,
   onReservationsPress,
+  refresh,
 }) {
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [isReservationsModalVisible, setReservationsModalVisible] =
@@ -43,17 +52,99 @@ export default function OfferItem({
   const [tempDescription, setTempDescription] = useState(description);
   const [tempPrice, setTempPrice] = useState(price);
 
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const handleSaveChanges = () => {
     // Implement logic to save changes, update the data, etc.
     console.log("Changes saved:", { tempTitle, tempDescription, tempPrice });
+
+    if(!tempTitle || !tempDescription || !tempPrice){
+      setShowError(true);
+      setErrorMessage("Please fill all the fields!");
+      return;
+    }
+    if(tempTitle===editedTitle && tempDescription===editedDescription && tempPrice===editedPrice){
+      setShowError(true);
+      setErrorMessage("No change is made!");
+      return;
+    }
 
     // Update the main state with the edited values
     setEditedTitle(tempTitle);
     setEditedDescription(tempDescription);
     setEditedPrice(tempPrice);
 
+    handleAPIModify();
     // Close the modal
+
+    // setTempTitle(title);
+    // setTempDescription(description);
+    // setTempPrice(price);
     hideEditModal();
+  };
+
+  const handleAPIModify = async () => {
+    try {
+      //setIsOffersLoading(true);
+      const userToken = await SecureStore.getItemAsync("userToken");
+      const userID = await SecureStore.getItemAsync("userID");
+      const apiUrl = `http://${IP_ADDRESS}:8080/api/seller/${userID}/modifyOffer/${id}`;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userToken}`
+        }
+      };
+
+      const response = await 
+      axios.post(apiUrl, {
+        offerName: editedTitle,
+        description: editedDescription,
+        price: editedPrice,
+        reserved: true
+      }, config).then((response) => {
+        console.log("offer editing successful");
+        console.log(response);
+
+        hideEditModal();
+        refresh();
+      });
+    } catch (error) {
+      console.error("Error editing offer:", error);
+      setErrorMessage("Error editing offer:", error);
+      setShowError(true);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      //setIsOffersLoading(true);
+      const userToken = await SecureStore.getItemAsync("userToken");
+      const userID = await SecureStore.getItemAsync("userID");
+      console.log(userToken);
+      console.log(userID);
+      console.log(id);
+      const apiUrl = `http://${IP_ADDRESS}:8080/api/seller/${userID}/modifyOffer/${id}/deleteOffer`;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userToken}`
+        }
+      };
+
+      console.log(apiUrl);
+      const response = await 
+      axios.delete(apiUrl, config).then((response) => {
+        console.log("offer deleted successfully");
+        
+        setConfirmDeleteModal(false);
+        hideEditModal();
+        refresh();
+      });
+    } catch (error) {
+      console.error("Error deleting offer:", error);
+      setErrorMessage("Error deleting offer:", error);
+      setShowError(true);
+    }
   };
 
   const handleDismiss = () => {
@@ -149,6 +240,7 @@ export default function OfferItem({
             <Button
               onPress={() => {
                 console.log("Offer deleted");
+                handleDelete();
                 setConfirmDeleteModal(false);
               }}
               mode="contained"
@@ -188,6 +280,15 @@ export default function OfferItem({
               </View>
             ))}
           </Modal>
+          {/*error occured, show a snackbar*/}
+          <Snackbar
+            visible={showError}
+            onDismiss={() => setShowError(false)}
+            onIconPress={() => setShowError(false)}
+            duration={Snackbar.LENGTH_SHORT}
+          >
+            {errorMessage}
+          </Snackbar>
         </Portal>
       </Card.Content>
     </Card>

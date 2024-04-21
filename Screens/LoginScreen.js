@@ -17,10 +17,12 @@ const logoImg = require('../assets/logo.png');
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
   const [showLoginFailed, setShowLoginFailed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [isLoginLoading, setIsLoginLoading] = useState(false);
 
-  const handleLogin = async () => {
+  const login = async () => {
     const apiUrl = `http://${IP_ADDRESS}:8080/api/auth/signin`;
 
     try {
@@ -40,10 +42,21 @@ export default function LoginScreen({ navigation }) {
       setIsLoginLoading(false);
       navigation.navigate("MainHome");
     } catch (error) {
+      setErrorMessage("Login Failed!");
       setShowLoginFailed(true);
       setIsLoginLoading(false);
     }
   };
+
+  const handleLogin = () => {
+    if( !email || !password){
+      setErrorMessage("Please fill all the fields!");
+      setShowLoginFailed(true);
+      return;
+    }
+    login();
+    setIsLoginLoading(false);
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -80,7 +93,7 @@ export default function LoginScreen({ navigation }) {
         onIconPress={() => setShowLoginFailed(false)}
         duration={Snackbar.LENGTH_SHORT}
       >
-        Login failed. Please try again.
+        {errorMessage}
       </Snackbar>
     </SafeAreaView>
   );

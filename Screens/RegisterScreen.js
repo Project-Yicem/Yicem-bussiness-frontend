@@ -12,24 +12,26 @@ const logoImg = require('../assets/logo.png');
 export default function RegisterScreen({ navigation }) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState();
+  const [confirmPassword, setConfirmPassword] = useState();
   const [address, setAddress] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [businessName, setBusinessName] = useState('');
   const [workingHours, setWorkingHours] = useState('');
 
   const [showFail, setShowFail] = useState(false);
+  const [errorText, setErrorText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
 
 
-  const handleRegister = async () => {
+  const register = async () => {
     const apiUrl = `http://${IP_ADDRESS}:8080/api/auth/signup/seller`;
 
     try {
       setIsLoading(true);
-      console.log("Registering with username: ", username);
-      console.log("Sending request to ", apiUrl);
+      //console.log("Registering with username: ", username);
+      //console.log("Sending request to ", apiUrl);
       
       const response = await 
       axios.post(apiUrl, {
@@ -47,21 +49,56 @@ export default function RegisterScreen({ navigation }) {
         console.log("Registration successful");
         setIsLoading(false);
         //setSuccessVisible(true);
+        navigation.navigate("Login");
       });
 
-      //console.log(response);
-      //const token = response.data.token;
-
-      // Store the token using expo-secure-store
-      //await SecureStore.setItemAsync("userToken", token);
-      //setIsLoading(false);
-      navigation.navigate("Login");
     } catch (error) {
       console.error("Error registering user:", error);
-      //setErrorText("Error registering user: " + error.message);
+      setErrorText("Error registering user!");
       setShowFail(true);
       setIsLoading(false);
     }
+  };
+
+  const handleRegister = () => {
+    // Regular expression for email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
+    // Regular expression for phone number validation
+    const phoneRegex = /^\d{10}$/;
+  
+    // Check if all fields are filled
+    if (!username || !email || !password || !address || !phoneNumber || !businessName || !workingHours) {
+      setErrorText("Please fill all the areas!");
+      setShowFail(true);
+      return;
+    }
+  
+    // Check if the password matches the confirm password
+    if (password !== confirmPassword) {
+      setErrorText("Passwords don't match!");
+      setShowFail(true);
+      setPassword("");
+      setConfirmPassword("");
+      return;
+    }
+  
+    // Check if email is valid
+    if (!emailRegex.test(email)) {
+      setErrorText("Please enter a valid email address!");
+      setShowFail(true);
+      return;
+    }
+  
+    // Check if phone number is valid
+    if (!phoneRegex.test(phoneNumber)) {
+      setErrorText("Please enter a valid phone number!");
+      setShowFail(true);
+      return;
+    }
+  
+    // Register the user if all conditions are met
+    register();
   };
 
   return (
@@ -92,6 +129,14 @@ export default function RegisterScreen({ navigation }) {
         label="Enter Password"
         value={password}
         onChangeText={(text) => setPassword(text)}
+        secureTextEntry
+        mode="outlined"
+        style={styles.input}
+      />
+      <TextInput
+        label="Confirm Password"
+        value={confirmPassword}
+        onChangeText={(text) => setConfirmPassword(text)}
         secureTextEntry
         mode="outlined"
         style={styles.input}
@@ -134,7 +179,7 @@ export default function RegisterScreen({ navigation }) {
         onIconPress={() => setShowFail(false)}
         duration={Snackbar.LENGTH_SHORT}
       >
-        Login failed. Please try again.
+        {errorText}
       </Snackbar>
     </SafeAreaView>
   );

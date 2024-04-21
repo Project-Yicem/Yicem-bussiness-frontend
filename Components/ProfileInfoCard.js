@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Image, TextInput } from "react-native";
 import { IconButton, Button } from "react-native-paper";
 
+
 const ProfileInfoCard = ({
   title,
   info,
