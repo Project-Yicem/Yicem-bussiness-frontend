@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SafeAreaView, View, StyleSheet, Image } from 'react-native';
 import { TextInput, Button, Text, Snackbar } from 'react-native-paper';
+import { TimePickerModal } from 'react-native-paper-dates';
 import styles, { theme } from '../Styles/styles';
 import RegisterInfoCard from '../Components/RegisterInfoCard';
 import axios from "axios";
@@ -19,12 +20,22 @@ export default function RegisterScreen({ navigation }) {
   const [businessName, setBusinessName] = useState('');
   const [workingHours, setWorkingHours] = useState('');
 
+  const [isTimePickerVisible, setIstimePickerVisible] = useState(false);
+
+  const hideTimePicker = () => {setIstimePickerVisible(false)}
+  const showTimePicker = () => {console.log("pick time")/*setIstimePickerVisible(true)*/}
+
   const [showFail, setShowFail] = useState(false);
   const [errorText, setErrorText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-
-
+  const handleTimeConfirm = (selectedDate) => {
+    const hours = selectedDate.getHours().toString().padStart(2, '0');
+    const minutes = selectedDate.getMinutes().toString().padStart(2, '0');
+    const formattedTime = `${hours}:${minutes}`;
+    setTime(formattedTime);
+    hideDatePicker();
+  };
   const register = async () => {
     const apiUrl = `http://${IP_ADDRESS}:8080/api/auth/signup/seller`;
 
@@ -146,6 +157,7 @@ export default function RegisterScreen({ navigation }) {
         value={phoneNumber}
         onChangeText={(text) => setPhoneNumber(text)}
         mode="outlined"
+        keyboardType="phone-pad" // Opens a numerical keyboard
         style={styles.input}
       />
       <TextInput
@@ -158,9 +170,17 @@ export default function RegisterScreen({ navigation }) {
       <TextInput
         label="Enter Working Hours"
         value={workingHours}
+        onFocus={showTimePicker}
         onChangeText={(text) => setWorkingHours(text)}
         mode="outlined"
         style={styles.input}
+      />
+      <TimePickerModal
+        visible={isTimePickerVisible}
+        onDismiss={hideTimePicker}
+        onConfirm={handleTimeConfirm}
+        hours={12}
+        minutes={14}
       />
       <Button 
       mode="contained"
@@ -172,7 +192,7 @@ export default function RegisterScreen({ navigation }) {
         Your request will be evaluated and you will be contacted via phone number and email you provided.
       </Text>
 
-      {/*Login failed, show a snackbar*/}
+      {/*Register failed, show a snackbar*/}
       <Snackbar
         visible={showFail}
         onDismiss={() => setShowFail(false)}

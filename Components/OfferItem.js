@@ -21,7 +21,6 @@ import * as SecureStore from "expo-secure-store";
 import { IP_ADDRESS } from "../Functions/GetIP";
 
 export default function OfferItem({
-  key,
   id,
   title,
   description,
@@ -55,7 +54,7 @@ export default function OfferItem({
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     // Implement logic to save changes, update the data, etc.
     console.log("Changes saved:", { tempTitle, tempDescription, tempPrice });
 
@@ -147,6 +146,40 @@ export default function OfferItem({
     }
   };
 
+  const confirmDelivery = async (reservationID) => {
+    try {
+      //setIsOffersLoading(true);
+      const userToken = await SecureStore.getItemAsync("userToken");
+      const userID = await SecureStore.getItemAsync("userID");
+      console.log(userToken);
+      console.log(userID);
+      console.log(id);
+      console.log(reservationID);
+
+      const apiUrl = `http://${IP_ADDRESS}:8080/api/seller/${userID}/markSold/${id}/${reservationID}`;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userToken}`
+        }
+      };
+
+      console.log(apiUrl);
+      const response = await 
+      axios.post(apiUrl,{} ,config).then((response) => {
+        console.log("Reservation delivered successfully");
+        
+        //setConfirmDeleteModal(false);
+        //hideEditModal();
+        hideReservationsModal();
+        refresh();
+      });
+    } catch (error) {
+      console.error("Error delivering reservation:", error);
+      setErrorMessage("Error delivering reservation:", error);
+      setShowError(true);
+    }
+  }
+
   const handleDismiss = () => {
     // Reset temp values
     setTempTitle(editedTitle);
@@ -212,6 +245,7 @@ export default function OfferItem({
               value={tempPrice}
               onChangeText={(text) => setTempPrice(text)}
               mode="outlined"
+              keyboardType="numeric" // Opens a numerical keyboard
               style={styles.input}
             />
             <Button onPress={handleSaveChanges} mode="contained">
@@ -266,17 +300,26 @@ export default function OfferItem({
           >
             <Title style={styles.modalTitle}>Reservations</Title>
             {reservations.map((reservation) => (
-              <View key={reservation.id} style={styles.reservationContainer}>
+              <View key={reservation} style={styles.reservationContainer}>
                 <View style={styles.reservationInfo}>
-                  <Text>{reservation.name}</Text>
-                  <Text>{reservation.pickupTime}</Text>
+                <Text>{reservation}</Text>
+                  <Text>{reservation.buyerId}</Text>
+                  <Text>{reservation.timeSlot}</Text>
                 </View>
-                <Checkbox
+                <IconButton
+                  icon= 'check'
+                  color='green'
+                  size={24}
+                  onPress={() => {
+                    confirmDelivery(reservation);
+                  }}
+                />
+                {/* <Checkbox
                   status={reservation.isSold ? "checked" : "unchecked"}
                   onValueChange={() => {
                     // Implement logic to toggle the isSold status of the reservation
                   }}
-                />
+                /> */}
               </View>
             ))}
           </Modal>

@@ -42,7 +42,7 @@ export default function LoginScreen({ navigation }) {
       setIsLoginLoading(false);
       navigation.navigate("MainHome");
     } catch (error) {
-      setErrorMessage("Login Failed!");
+      setErrorMessage("Login Failed! : ", error );
       setShowLoginFailed(true);
       setIsLoginLoading(false);
     }

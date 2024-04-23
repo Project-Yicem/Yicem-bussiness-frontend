@@ -16,6 +16,37 @@ const HistoryScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   //const [sales, setSales] = useState([]);
 
+  const [sales, setSales] = useState([]);
+  //   {
+  //     id: '1',
+  //     title: 'Pastry Box',
+  //     price: '$19.99',
+  //     dateTime: '2023-12-01 08:30 AM',
+  //     rating: 4,
+  //     customerName: "John Doe",
+  //     comment:null,
+  //   },
+  //   {
+  //     id: '2',
+  //     title: 'Product 2',
+  //     price: '$29.99',
+  //     dateTime: '2023-12-02 10:45 AM',
+  //     rating: 2,
+  //     customerName: "John Dove",
+  //     comment:null,
+  //   },
+  //   {
+  //     id: '2',
+  //     title: 'Product 2',
+  //     price: '$29.99',
+  //     dateTime: '2023-12-02 10:45 AM',
+  //     rating: 5,
+  //     customerName: "Joe Boe",
+  //     comment:"It was just as fresh! would recommend."
+  //   },
+  //   // Add more sale items as needed
+  // ]);
+
   //Fetch offers
   const fetchSales = async () => {
     try {
@@ -60,36 +91,23 @@ const HistoryScreen = () => {
     fetchSales();
   }, []);
 
-  const [sales, setSales] = useState([
-    {
-      id: '1',
-      title: 'Pastry Box',
-      price: '$19.99',
-      dateTime: '2023-12-01 08:30 AM',
-      rating: 4,
-      customerName: "John Doe",
-      comment:null,
-    },
-    {
-      id: '2',
-      title: 'Product 2',
-      price: '$29.99',
-      dateTime: '2023-12-02 10:45 AM',
-      rating: 2,
-      customerName: "John Dove",
-      comment:null,
-    },
-    {
-      id: '2',
-      title: 'Product 2',
-      price: '$29.99',
-      dateTime: '2023-12-02 10:45 AM',
-      rating: 5,
-      customerName: "Joe Boe",
-      comment:"It was just as fresh! would recommend."
-    },
-    // Add more sale items as needed
-  ]);
+  const showSales = () => {
+    try{
+      return(
+        sales.map((item) => (
+          <SaleItem
+            key={item.id}
+            title={item/*item.title*/}
+            price={item.price}
+            dateTime={item.dateTime}
+            rating={item.rating}
+            customerName={item.customerName}
+            comment={item.comment}
+          />
+      )));
+    }
+    catch(error){console.log(error)}
+  }
 
   return (
     <ScrollView 
@@ -98,17 +116,7 @@ const HistoryScreen = () => {
       <RefreshControl refreshing={isLoading} onRefresh={fetchSales} />
     }
     >
-      {sales.map((item) => (
-          <SaleItem
-            key={item.id}
-            title={item.title}
-            price={item.price}
-            dateTime={item.dateTime}
-            rating={item.rating}
-            customerName={item.customerName}
-            comment={item.comment}
-          />
-      ))}
+      {showSales()}
       {/*error occured, show a snackbar*/}
       <Snackbar
         visible={showError}

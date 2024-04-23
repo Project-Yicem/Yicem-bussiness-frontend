@@ -18,7 +18,7 @@ const ProfileInfoCard = ({
   };
 
   const handleSavePress = () => {
-    onEditSave(title, editedInfo);
+    onEditSave(editedInfo);
     setIsEditing(false);
   };
 

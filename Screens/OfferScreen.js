@@ -9,6 +9,7 @@ import {
   Text,
   ActivityIndicator,
   Snackbar,
+  Searchbar,
 } from "react-native-paper";
 import OfferItem from "../Components/OfferItem";
 import { theme } from "../Styles/styles"; 
@@ -24,6 +25,9 @@ export default function OffersScreen({ navigation }) {
 
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
 
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
@@ -120,6 +124,8 @@ export default function OffersScreen({ navigation }) {
       return;
     }
 
+    console.log(selectedPickupTimes);
+
     try {
       setIsOffersLoading(true);
 
@@ -138,7 +144,15 @@ export default function OffersScreen({ navigation }) {
         description: newDescription,
         price: newPrice,
         itemCount: newTotalItems,
-        reserved: true
+        reserved: true,
+        pickupTimes: selectedPickupTimes.map(time => {
+          const [startTime, endTime] = time.split("-");
+          return {
+            pickupTimeStart: startTime.trim(),
+            pickupTimeEnd: endTime.trim()
+          };
+        }),
+        //mysteryBox: true,
       }, config).then((response) => {
         console.log("offer adding successful");
         console.log(response);
@@ -155,6 +169,18 @@ export default function OffersScreen({ navigation }) {
   useEffect(() => {
     fetchOffers();
   }, []);
+
+  useEffect(() => {
+    if (!searchQuery) {
+      setFilteredData(offers);
+      return;
+    }
+    setFilteredData(
+      offers.filter((offer) =>
+        offer.offerName.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
+  }, [offers, searchQuery]);
 
   const generatePickupTimes = (openingTime, closingTime) => {
     const [openingHour, openingMinute] = openingTime.split(".").map(Number);
@@ -192,27 +218,31 @@ export default function OffersScreen({ navigation }) {
 
   const renderOffers = () => {
     //console.log(offers);
-    if (!offers || offers.length === 0) {
+    if (!filteredData || filteredData.length === 0) {
       return <Text>No Offers</Text>;
     }
-  
-    return offers.map((item) => (
-      
-      <OfferItem
-        key={item.id}
-        id={item.id}
-        title={item.offerName}
-        description={item.description}
-        price={item.price}
-        itemsLeft={item.itemCount}
-        totalItems={item.totalItems}
-        pickupTimes={[]} // {item.pickupTimes}
-        reservations={item.reservations}
-        onEditPress={() => handleEditPress(item.id)}
-        onReservationsPress={() => handleReservationsPress(item.id)}
-        refresh={fetchOffers}
-      />
-    ));
+
+    try{
+      return filteredData.map((item) => (
+        
+        <OfferItem
+          key={item.id}
+          id={item.id}
+          title={item.offerName}
+          description={item.description}
+          price={item.price}
+          itemsLeft={item.itemCount}
+          totalItems={item.totalItems}
+          pickupTimes={[]} // {item.pickupTimes}
+          reservations={item.reservations}
+          onEditPress={() => handleEditPress(item.id)}
+          onReservationsPress={() => handleReservationsPress(item.id)}
+          refresh={fetchOffers}
+        />
+      ));
+    } catch(error){
+      return;
+    }
   };
 
   return (
@@ -228,6 +258,12 @@ export default function OffersScreen({ navigation }) {
           color={theme.colors.primary}
           style={{ marginTop: "20%" }}
         /> */}
+        <Searchbar
+          placeholder="Search Offer..."
+          onChangeText={(query) => setSearchQuery(query)}
+          value={searchQuery}
+          style={styles.searchBar}
+        />
         {renderOffers()}
           <Button
             icon="plus"
@@ -267,6 +303,7 @@ export default function OffersScreen({ navigation }) {
               value={newPrice}
               onChangeText={(text) => setNewPrice(text)}
               mode="outlined"
+              keyboardType="numeric" // Opens a numerical keyboard
               style={styles.input}
             />
             <TextInput
@@ -274,6 +311,7 @@ export default function OffersScreen({ navigation }) {
               value={newTotalItems}
               onChangeText={(text) => setNewTotalItems(text)}
               mode="outlined"
+              keyboardType="numeric" // Opens a numerical keyboard
               style={styles.input}
             />
             <Text style={styles.modalTitle}>Select Pickup Times</Text>
@@ -351,6 +389,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 5,
+  },
+  searchBar: {
+    margin: 16,
+    marginTop: 40,
+    backgroundColor: "#ffffff",
   },
 });
 
