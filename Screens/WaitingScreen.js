@@ -17,15 +17,15 @@ export default function WaitingScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <Image source={logoImg} style={styles.image} />
       <Text style={styles.text} >
-        Your request for ----- is being prcessed and evaluated. You will be able to access the application as soon is your request is approved.
+        Your request is being prcessed and evaluated. You will be able to access the application as soon is your request is approved.
         
         Thank you for your patience.
       </Text>
-      <Button mode="contained" onPress={() => navigation.navigate('Register')} style={styles.hollowButton}>
+      {/* <Button mode="contained" onPress={() => navigation.navigate('Register')} style={styles.hollowButton}>
         Change Info
-      </Button>
+      </Button> */}
       <Button mode="contained" onPress={() => navigation.navigate('Login')} style={styles.hollowButton}> 
-        Log Out
+        Log In
       </Button>
     </SafeAreaView>
   );

@@ -43,7 +43,7 @@ function AppContent(){
     const userToken = await SecureStore.getItemAsync("userToken");          //PRONE TO FAIL
     if (userToken) {
       console.log(userToken);
-      navigation.navigate("MainHome");
+      navigation.navigate("Login");
     } else {
       navigation.navigate("Login");
     }

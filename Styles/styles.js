@@ -56,6 +56,13 @@ const styles = StyleSheet.create({
       color: "black",
       fontSize: 16,
     },
+    searchBar: {
+      margin: 16,
+      //marginTop: 40,
+      backgroundColor: "#ffffff",
+      borderWidth: 1,
+      borderColor: "#000000" // Change the color as needed
+    },
   });
 
   export default styles;

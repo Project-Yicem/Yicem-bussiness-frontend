@@ -35,7 +35,17 @@ const ProfileScreen = () => {
   //   openingTime: "08.00",
   //   closingTime: "17.00",
   // };
-  const [businessInfo,setBusinessInfo] = useState([]);
+  const [businessInfo,setBusinessInfo] = useState({
+    businessName: "Your Business Name",
+    email: "business@example.com",
+    password: "********", // Masked password
+    phoneNumber: "+1234567890",
+    address: "123 Business Street, City, Country",
+    // You can replace the image source with the actual path or URL of the profile picture
+    profilePicture: require("../assets/businesslogos/logo_bakery.png"),
+    openingTime: "08.00",
+    closingTime: "17.00",
+  });
 
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -133,11 +143,11 @@ const ProfileScreen = () => {
       const response = await axios.get(apiUrl, config);
       console.log(response);
       
-      if (parseInt(response.headers['content-length']) === 0) {
-        setBusinessInfo([]);
-      } else {
-        setBusinessInfo(response.data);
-      }
+      // if (parseInt(response.headers['content-length']) === 0) {
+      //   setBusinessInfo([]);
+      // } else {
+        //setBusinessInfo(response.data);
+      //}
       setIsRefreshing(false);
 
       // Add an arbitrary "isOpen" attribute to each business

@@ -233,7 +233,7 @@ export default function OffersScreen({ navigation }) {
           price={item.price}
           itemsLeft={item.itemCount}
           totalItems={item.totalItems}
-          pickupTimes={[]} // {item.pickupTimes}
+          pickupTimes={item.pickupTimes}
           reservations={item.reservations}
           onEditPress={() => handleEditPress(item.id)}
           onReservationsPress={() => handleReservationsPress(item.id)}
@@ -392,8 +392,10 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     margin: 16,
-    marginTop: 40,
+    //marginTop: 40,
     backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: theme.colors.primary, // Change the color as needed
   },
 });
 

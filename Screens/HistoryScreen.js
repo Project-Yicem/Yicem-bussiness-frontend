@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, FlatList, StyleSheet, ScrollView, RefreshControl } from 'react-native';
-import { Button, Title, Card, Snackbar, } from 'react-native-paper';
+import { Button, Title, Card, Snackbar, Searchbar,} from 'react-native-paper';
 import SaleItem from '../Components/SaleItem';
 import { theme } from "../Styles/styles"; 
 
@@ -15,6 +15,9 @@ const HistoryScreen = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   //const [sales, setSales] = useState([]);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
 
   const [sales, setSales] = useState([]);
   //   {
@@ -91,17 +94,30 @@ const HistoryScreen = () => {
     fetchSales();
   }, []);
 
+  useEffect(() => {
+    if (!searchQuery) {
+      setFilteredData(sales);
+      return;
+    }
+    setFilteredData(
+      sales.filter((item) =>
+        item.offerName.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
+  }, [sales, searchQuery]);
+
   const showSales = () => {
+    console.log(sales);
     try{
       return(
-        sales.map((item) => (
+        filteredData.map((item) => (
           <SaleItem
             key={item.id}
-            title={item/*item.title*/}
+            title={item.offerName/*item.title*/}
             price={item.price}
-            dateTime={item.dateTime}
-            rating={item.rating}
-            customerName={item.customerName}
+            dateTime={item.transactionDate}
+            rating={item.rating || 5}
+            customerName={item.buyerName}
             comment={item.comment}
           />
       )));
@@ -111,11 +127,17 @@ const HistoryScreen = () => {
 
   return (
     <ScrollView 
-    style={styles.container}
+    // style={styles.container}
     refreshControl={
       <RefreshControl refreshing={isLoading} onRefresh={fetchSales} />
     }
     >
+      <Searchbar
+        placeholder="Search Offer..."
+        onChangeText={(query) => setSearchQuery(query)}
+        value={searchQuery}
+        style={styles.searchBar}
+      />
       {showSales()}
       {/*error occured, show a snackbar*/}
       <Snackbar
@@ -144,6 +166,13 @@ const styles = StyleSheet.create({
   },
   backButton: {
     marginTop: 16,
+  },
+  searchBar: {
+    margin: 16,
+    //marginTop: 40,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: theme.colors.primary, // Change the color as needed
   },
 });
 

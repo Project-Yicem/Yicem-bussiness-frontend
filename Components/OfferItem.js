@@ -209,11 +209,11 @@ export default function OfferItem({
         <Paragraph
           style={{ color: "gray", fontStyle: "italic", marginBottom: 10 }}
         >
-          {pickupTimes.map((time) => `${time}, `)}
+          {pickupTimes && pickupTimes.map((time) => `${time.pickupTimeStart} - ${time.pickupTimeEnd}, `)}
         </Paragraph>
         {/* Price, Reservations button, Items Left */}
         <View style={styles.bottomContainer}>
-          <Text style={styles.price}>{editedPrice}</Text>
+          <Text style={styles.price}>{editedPrice} ₺</Text>
           <TouchableOpacity onPress={onReservationsPress}>
             <Button onPress={showReservationsModal}>Reservations</Button>
           </TouchableOpacity>
@@ -299,19 +299,18 @@ export default function OfferItem({
             contentContainerStyle={styles.modalContainer}
           >
             <Title style={styles.modalTitle}>Reservations</Title>
-            {reservations.map((reservation) => (
-              <View key={reservation} style={styles.reservationContainer}>
+            {/*console.log(reservations) &&*/ reservations.map((reservation) => (
+              <View key={reservation.id} style={styles.reservationContainer}>
                 <View style={styles.reservationInfo}>
-                <Text>{reservation}</Text>
-                  <Text>{reservation.buyerId}</Text>
-                  <Text>{reservation.timeSlot}</Text>
+                  <Text>{reservation.sellerName}</Text>
+                  <Text>{reservation.timeslot}</Text>
                 </View>
                 <IconButton
                   icon= 'check'
                   color='green'
                   size={24}
                   onPress={() => {
-                    confirmDelivery(reservation);
+                    confirmDelivery(reservation.id);
                   }}
                 />
                 {/* <Checkbox
