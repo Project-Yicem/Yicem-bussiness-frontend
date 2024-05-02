@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, TextInput } from "react-native";
 import { IconButton, Button } from "react-native-paper";
 
@@ -9,17 +9,28 @@ const ProfileInfoCard = ({
   isProfilePicture,
   onEditSave,
   isTimeRange,
+  isPassword,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedInfo, setEditedInfo] = useState(info);
+
+  useEffect(() => {
+    setEditedInfo(info);
+  },[info])
+
+  useEffect(() => {
+    setEditedInfo(info);
+  },[])
 
   const handleEditPress = () => {
     setIsEditing(true);
   };
 
-  const handleSavePress = () => {
-    onEditSave(editedInfo);
-    setIsEditing(false);
+  const handleSavePress = async () => {
+    if(await onEditSave(editedInfo)){
+      setIsEditing(false);
+    }
+    return;
   };
 
   const handleCancelPress = () => {
@@ -55,13 +66,38 @@ const ProfileInfoCard = ({
               style={styles.editableText}
             />
           </View>
-        ) : (
-          <TextInput
-            value={editedInfo}
-            onChangeText={setEditedInfo}
-            editable={isEditing}
-            style={styles.editableText}
-          />
+        ) : isPassword ? ( isEditing ?
+          <View style={styles.editableText}>
+            <Text>Confirm old Password</Text>
+            <TextInput
+              value={editedInfo.oldPassword}
+              onChangeText={(text) =>
+                setEditedInfo({ ...editedInfo, oldPassword: text })
+              }
+              secureTextEntry
+              editable={isEditing}
+              style={styles.editableText}
+            />
+            <Text>New Password</Text>
+            <TextInput
+              value={editedInfo.newPassword}
+              onChangeText={(text) =>
+                setEditedInfo({ ...editedInfo, newPassword: text })
+              }
+              secureTextEntry
+              editable={isEditing}
+              style={styles.editableText}
+            />
+          </View> 
+          : 
+          <View></View>
+            ) : (
+            <TextInput
+              value={editedInfo}
+              onChangeText={setEditedInfo}
+              editable={isEditing}
+              style={styles.editableText}
+            />
         )}
       </View>
       <View style={styles.buttonContainer}>

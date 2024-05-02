@@ -63,6 +63,12 @@ const styles = StyleSheet.create({
       borderWidth: 1,
       borderColor: "#000000" // Change the color as needed
     },
+    timeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   });
 
   export default styles;

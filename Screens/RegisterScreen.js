@@ -18,7 +18,10 @@ export default function RegisterScreen({ navigation }) {
   const [address, setAddress] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [businessName, setBusinessName] = useState('');
-  const [workingHours, setWorkingHours] = useState('');
+  //const [workingHours, setWorkingHours] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+
 
   const [isTimePickerVisible, setIstimePickerVisible] = useState(false);
 
@@ -52,9 +55,11 @@ export default function RegisterScreen({ navigation }) {
         address: address,
         phone: phoneNumber,
         businessName: businessName,
-        workingHours: workingHours,
-        locationCoordinates: "0",
-        reservationTimeOut: 0,
+        //workingHours: workingHours,
+        openingHour: startTime,
+        closingHour: endTime,
+        //locationCoordinates: "0",
+        //reservationTimeOut: 0,
         approved: true
       }).then((response) => {
         console.log("Registration successful");
@@ -79,7 +84,7 @@ export default function RegisterScreen({ navigation }) {
     const phoneRegex = /^\d{10}$/;
   
     // Check if all fields are filled
-    if (!username || !email || !password || !address || !phoneNumber || !businessName || !workingHours) {
+    if (!username || !email || !password || !address || !phoneNumber || !businessName || !startTime || !endTime) {//!workingHours) {
       setErrorText("Please fill all the areas!");
       setShowFail(true);
       return;
@@ -170,14 +175,32 @@ export default function RegisterScreen({ navigation }) {
           mode="outlined"
           style={styles.input}
         />
-        <TextInput
+        <View style={styles.timeContainer}>
+          <TextInput
+            label="Start Time"
+            value={startTime}
+            onFocus={showTimePicker}
+            onChangeText={(text) => setStartTime(text)}
+            mode="outlined"
+            style={styles.timeInput}
+          />
+          <TextInput
+            label="End Time"
+            value={endTime}
+            onFocus={showTimePicker}
+            onChangeText={(text) => setEndTime(text)}
+            mode="outlined"
+            style={styles.timeInput}
+          />
+        </View>
+        {/* <TextInput
           label="Enter Working Hours"
           value={workingHours}
           onFocus={showTimePicker}
           onChangeText={(text) => setWorkingHours(text)}
           mode="outlined"
           style={styles.input}
-        />
+        /> */}
         <TimePickerModal
           visible={isTimePickerVisible}
           onDismiss={hideTimePicker}

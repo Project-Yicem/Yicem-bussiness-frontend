@@ -29,10 +29,12 @@ export default function LoginScreen({ navigation }) {
       setIsLoginLoading(true);
       console.log("Logging in with username: ", email);
       console.log("Sending request to ", apiUrl);
-      const response = await axios.post(apiUrl, {
+      const data = {
         username: email,
         password: password,
-      });
+      };
+      console.log(data);
+      const response = await axios.post(apiUrl, data);
       console.log(response);
       const token = response.data.token;
       const userID = response.data.id;

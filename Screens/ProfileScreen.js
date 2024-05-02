@@ -35,17 +35,17 @@ const ProfileScreen = () => {
   //   openingTime: "08.00",
   //   closingTime: "17.00",
   // };
-  const [businessInfo,setBusinessInfo] = useState({
-    businessName: "Your Business Name",
-    email: "business@example.com",
-    password: "********", // Masked password
-    phoneNumber: "+1234567890",
-    address: "123 Business Street, City, Country",
-    // You can replace the image source with the actual path or URL of the profile picture
-    profilePicture: require("../assets/businesslogos/logo_bakery.png"),
-    openingTime: "08.00",
-    closingTime: "17.00",
-  });
+  const [businessInfo,setBusinessInfo] = useState([]);
+  //   businessName: "Your Business Name",
+  //   email: "business@example.com",
+  //   password: "********", // Masked password
+  //   phoneNumber: "+1234567890",
+  //   address: "123 Business Street, City, Country",
+  //   // You can replace the image source with the actual path or URL of the profile picture
+  //   profilePicture: require("../assets/businesslogos/logo_bakery.png"),
+  //   openingTime: "08.00",
+  //   closingTime: "17.00",
+  // });
 
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -53,32 +53,65 @@ const ProfileScreen = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const putBusinessName = (value) => {
+    if(!value){
+      setErrorMessage("Please enter a valid value!");
+      setShowError(true);
+      return 0;
+    }
     const data = {
       businessName: value
     };
     handleAPIprofileChange(data);
+    return 1;
   }
 
   const putAddress = (value) => {
+    if(!value){
+      setErrorMessage("Please enter a valid value!");
+      setShowError(true);
+      return 0;
+    }
     const data = {
       address: value
     };
     handleAPIprofileChange(data);
+    return 1;
   }
 
   const putPhoneNumber = (value) => {
+    const phoneRegex = /^\d{10}$/;
+
+    if(!value || !phoneRegex.test(value)){
+      setErrorMessage("Please enter a valid number!");
+      setShowError(true);
+      return 0;
+    }
     const data = {
       phone: value
     };
     handleAPIprofileChange(data);
+    return 1;
   }
 
   const putOpenHours = (value) => {
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    if(!value.openingTime || !value.closingTime ){
+      setErrorMessage("Please enter valid values!");
+      setShowError(true);
+      return 0;
+    }
+    if(!timeRegex.test(value.openingTime) || !timeRegex.test(value.closingTime)){
+      setErrorMessage("Please enter time in HH:MM format!");
+      setShowError(true);
+      return 0;
+    }
+
     const data = {
-      openingHour: value,
-      closingHour: value
+      openingHour: value.openingTime,
+      closingHour: value.closingTime
     };
     handleAPIprofileChange(data);
+    return 1;
   }
 
   const putImage = (value) => {
@@ -87,11 +120,44 @@ const ProfileScreen = () => {
     //handleAPIprofileChange(data);
   }
 
-  const handleEditSave = (field, editedInfo) => {
-    // Handle saving the edited information
-    console.log(`Edit ${field}: ${editedInfo}`);
-    // You can add logic to save the edited information to your data source
-    handleAPIprofileChange(field,editedInfo);
+  const changePassword = async (value) => {
+    if(!value.oldPassword || !value.newPassword){
+      setErrorMessage("Please enter valid passwords!");
+      setShowError(true);
+      return 0;
+    }
+    try {
+      setIsRefreshing(true);
+
+      const data = {
+        oldPassword: value.oldPassword,
+        newPassword:value.newPassword
+      };
+
+      const userToken = await SecureStore.getItemAsync("userToken");
+
+      const apiUrl = `http://${IP_ADDRESS}:8080/api/seller/update-password`;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userToken}`
+        }
+      };
+
+      // Create an object to hold the data
+    
+    console.log("edited passwords: ",data);
+      const response = await 
+      axios.put(apiUrl, data, config).then((response) => {
+        //console.log("changed ", field," successfully!");
+        console.log(response);
+        setIsRefreshing(false);
+        fetchProfile();
+      });
+    } catch (error) {
+      console.error("Error updating password:", error);
+      setIsRefreshing(false);
+    }
+    return 1;
   };
 
   const handleAPIprofileChange = async (data) => {
@@ -99,8 +165,7 @@ const ProfileScreen = () => {
       setIsRefreshing(true);
 
       const userToken = await SecureStore.getItemAsync("userToken");
-      //const userID = await SecureStore.getItemAsync("userID");
-      //console.log(userID);
+
       const apiUrl = `http://${IP_ADDRESS}:8080/api/seller/update`;
       const config = {
         headers: {
@@ -112,16 +177,15 @@ const ProfileScreen = () => {
     
     console.log("edited data: ",data);
       const response = await 
-      axios.post(apiUrl, data, config).then((response) => {
-        console.log("changed ", field," successfully!");
+      axios.put(apiUrl, data, config).then((response) => {
+        //console.log("changed ", field," successfully!");
         console.log(response);
-        setIsOffersLoading(false);
-        hideModal();  //setSuccessVisible(true);
-        fetchOffers();
+        setIsRefreshing(false);
+        fetchProfile();
       });
     } catch (error) {
-      console.error("Error adding offers:", error);
-      setIsOffersLoading(false);
+      console.error("Error updating profile:", error);
+      setIsRefreshing(false);
     }
   }
 
@@ -137,17 +201,19 @@ const ProfileScreen = () => {
       const apiUrl = `http://${IP_ADDRESS}:8080/api/seller/${userID}`;
       const config = {
         headers: {
-          Authorization: `Bearer ${userToken}`
+          Authorization: `Bearer ${userToken}`,
+          "Content-Type": "application/json",
         }
       };
       const response = await axios.get(apiUrl, config);
       console.log(response);
-      
-      // if (parseInt(response.headers['content-length']) === 0) {
-      //   setBusinessInfo([]);
-      // } else {
-        //setBusinessInfo(response.data);
-      //}
+
+      if (parseInt(response.headers['content-length']) === 0) {
+        setBusinessInfo([]);
+      } else {
+        setBusinessInfo(response.data);
+      }
+
       setIsRefreshing(false);
 
       // Add an arbitrary "isOpen" attribute to each business
@@ -167,7 +233,10 @@ const ProfileScreen = () => {
 
   useEffect(() => {
     fetchProfile();
-  }, []); 
+  }, []);
+
+  useEffect(() => {
+  }, [businessInfo]);
 
   return (
     <KeyboardAvoidingView
@@ -187,20 +256,8 @@ const ProfileScreen = () => {
             onEditSave={putBusinessName}
           />
           <ProfileInfoCard
-            title="Email"
-            info={businessInfo.email}
-            isEditable={true}
-            onEditSave={handleEditSave}
-          />
-          <ProfileInfoCard
-            title="Password"
-            info={businessInfo.password}
-            isEditable={true}
-            onEditSave={handleEditSave}
-          />
-          <ProfileInfoCard
             title="Phone Number"
-            info={businessInfo.phoneNumber}
+            info={businessInfo.phone}
             isEditable={true}
             onEditSave={putPhoneNumber}
           />
@@ -213,8 +270,8 @@ const ProfileScreen = () => {
           <ProfileInfoCard
             title="Open Hours"
             info={{
-              openingTime: businessInfo.openingTime,
-              closingTime: businessInfo.closingTime,
+              openingTime: businessInfo.openingHour,
+              closingTime: businessInfo.closingHour,
             }}
             isEditable={true}
             onEditSave={putOpenHours}
@@ -223,10 +280,22 @@ const ProfileScreen = () => {
           <ProfileInfoCard
             title="Profile Picture"
             isProfilePicture={true}
-            info={businessInfo.profilePicture}
+            info={businessInfo.logo}
             isEditable={true}
             onEditSave={putImage}
           />
+          <View style={{borderWidth: 2, borderColor: "#f26f55", borderRadius: 10, backgroundColor: "#ffffff",}}>
+            <ProfileInfoCard
+              title="Change Password"
+              info={{
+                oldPassword:"",
+                newPassword:""
+              }}
+              isEditable={true}
+              onEditSave={changePassword}
+              isPassword={true}
+            />
+          </View>
         </View>
         <View style={styles.buttonContainer}>
           <Button
@@ -251,7 +320,8 @@ const ProfileScreen = () => {
             Edit Map Location
           </Button>
         </View>
-        <Snackbar
+      </ScrollView>
+      <Snackbar
           visible={showError}
           onDismiss={() => setShowError(false)}
           onIconPress={() => setShowError(false)}
@@ -259,7 +329,6 @@ const ProfileScreen = () => {
         >
           {errorMessage}
         </Snackbar>
-      </ScrollView>
     </KeyboardAvoidingView>
   );
 };
