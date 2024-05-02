@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, TextInput } from "react-native";
 import { IconButton, Button } from "react-native-paper";
 
-
 const ProfileInfoCard = ({
   title,
   info,
@@ -16,18 +15,18 @@ const ProfileInfoCard = ({
 
   useEffect(() => {
     setEditedInfo(info);
-  },[info])
+  }, [info]);
 
   useEffect(() => {
     setEditedInfo(info);
-  },[])
+  }, []);
 
   const handleEditPress = () => {
     setIsEditing(true);
   };
 
   const handleSavePress = async () => {
-    if(await onEditSave(editedInfo)){
+    if (await onEditSave(editedInfo)) {
       setIsEditing(false);
     }
     return;
@@ -36,14 +35,14 @@ const ProfileInfoCard = ({
   const handleCancelPress = () => {
     setEditedInfo(info);
     setIsEditing(false);
-  }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.infoContainer}>
         <Text style={styles.title}>{title}</Text>
         {isProfilePicture ? (
           <View style={styles.profilePictureContainer}>
-            <Image source={info} style={styles.profilePicture} />
+            <Image source={{ uri: info }} style={styles.profilePicture} />
           </View>
         ) : isTimeRange ? (
           <View style={styles.editableText}>
@@ -66,42 +65,44 @@ const ProfileInfoCard = ({
               style={styles.editableText}
             />
           </View>
-        ) : isPassword ? ( isEditing ?
-          <View style={styles.editableText}>
-            <Text>Confirm old Password</Text>
-            <TextInput
-              value={editedInfo.oldPassword}
-              onChangeText={(text) =>
-                setEditedInfo({ ...editedInfo, oldPassword: text })
-              }
-              secureTextEntry
-              editable={isEditing}
-              style={styles.editableText}
-            />
-            <Text>New Password</Text>
-            <TextInput
-              value={editedInfo.newPassword}
-              onChangeText={(text) =>
-                setEditedInfo({ ...editedInfo, newPassword: text })
-              }
-              secureTextEntry
-              editable={isEditing}
-              style={styles.editableText}
-            />
-          </View> 
-          : 
-          <View></View>
-            ) : (
-            <TextInput
-              value={editedInfo}
-              onChangeText={setEditedInfo}
-              editable={isEditing}
-              style={styles.editableText}
-            />
+        ) : isPassword ? (
+          isEditing ? (
+            <View style={styles.editableText}>
+              <Text>Confirm old Password</Text>
+              <TextInput
+                value={editedInfo.oldPassword}
+                onChangeText={(text) =>
+                  setEditedInfo({ ...editedInfo, oldPassword: text })
+                }
+                secureTextEntry
+                editable={isEditing}
+                style={styles.editableText}
+              />
+              <Text>New Password</Text>
+              <TextInput
+                value={editedInfo.newPassword}
+                onChangeText={(text) =>
+                  setEditedInfo({ ...editedInfo, newPassword: text })
+                }
+                secureTextEntry
+                editable={isEditing}
+                style={styles.editableText}
+              />
+            </View>
+          ) : (
+            <View></View>
+          )
+        ) : (
+          <TextInput
+            value={editedInfo}
+            onChangeText={setEditedInfo}
+            editable={isEditing}
+            style={styles.editableText}
+          />
         )}
       </View>
       <View style={styles.buttonContainer}>
-        {!isProfilePicture && !isEditing &&(
+        {!isProfilePicture && !isEditing && (
           <IconButton
             icon="pencil"
             size={24}
@@ -110,7 +111,7 @@ const ProfileInfoCard = ({
             onPress={handleEditPress}
           />
         )}
-         {!isProfilePicture && isEditing && (
+        {!isProfilePicture && isEditing && (
           <IconButton
             icon="close"
             size={24}
@@ -158,9 +159,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   profilePicture: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 100,
+    height: 100,
+    borderRadius: 8,
   },
   editIcon: {
     marginLeft: 8,

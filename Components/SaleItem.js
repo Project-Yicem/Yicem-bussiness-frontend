@@ -1,10 +1,17 @@
 // SaleItem.js
-import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Card, Title, Paragraph, IconButton } from 'react-native-paper';
-import StarRating from 'react-native-star-rating';
+import React, { useState } from "react";
+import { StyleSheet, View } from "react-native";
+import { Card, Title, Paragraph, IconButton } from "react-native-paper";
+import StarRating from "react-native-star-rating";
 
-const SaleItem = ({ title, price, dateTime, rating, customerName, comment }) => {
+const SaleItem = ({
+  title,
+  price,
+  dateTime,
+  rating,
+  customerName,
+  comment,
+}) => {
   const [expanded, setExpanded] = useState(false);
 
   const handleToggleMode = () => {
@@ -18,38 +25,45 @@ const SaleItem = ({ title, price, dateTime, rating, customerName, comment }) => 
         <View style={styles.titleContainer}>
           <Title style={styles.title}>{title}</Title>
           <IconButton
-            icon={expanded ? 'chevron-up' : 'chevron-down'}
+            icon={expanded ? "chevron-up" : "chevron-down"}
             size={20}
             onPress={handleToggleMode}
           />
         </View>
-
         {/* Date and Time */}
         <Paragraph style={styles.saleDateTime}>{dateTime}</Paragraph>
-
         {/* Price and Star Rating */}
         <View style={styles.descriptionContainer}>
-          <StarRating
-            disabled={true}
-            maxStars={5}
-            rating={rating}
-            starSize={14}
-            fullStarColor="green"
-            emptyStarColor="grey"
-          />
-          <Paragraph style={styles.price}>{price}</Paragraph>
+          {rating < 0 ? (
+            <Paragraph style={styles.saleRating}>No rating yet</Paragraph>
+          ) : (
+            <StarRating
+              disabled={true}
+              maxStars={5}
+              rating={rating}
+              starSize={14}
+              fullStarColor="green"
+              emptyStarColor="grey"
+            />
+          )}
+          <Paragraph style={styles.price}>₺{price}</Paragraph>
         </View>
-
         {expanded && (
           <>
             {customerName && (
-              <Paragraph style={styles.saleRating}>Customer: {customerName}</Paragraph>
+              <Paragraph style={styles.saleRating}>
+                Customer: {customerName}
+              </Paragraph>
             )}
-            {comment && <View style={styles.reviewContainer}>
-              <Paragraph>{comment}</Paragraph>
-            </View>}
+            {comment && (
+              <View style={styles.reviewContainer}>
+                <Paragraph>{comment}</Paragraph>
+              </View>
+            )}
             {customerName && !comment && (
-              <Paragraph style={styles.noCommentText}>No comments yet</Paragraph>
+              <Paragraph style={styles.noCommentText}>
+                No comments yet
+              </Paragraph>
             )}
           </>
         )}
@@ -60,14 +74,14 @@ const SaleItem = ({ title, price, dateTime, rating, customerName, comment }) => 
 
 const styles = StyleSheet.create({
   offerContainer: {
-    backgroundColor: '#fff',
-    borderColor: '#f26f55',
+    backgroundColor: "#fff",
+    borderColor: "#f26f55",
     borderWidth: 2,
     margin: 16,
   },
   reviewContainer: {
-    backgroundColor: '#fff',
-    borderColor: '#f26f55',
+    backgroundColor: "#fff",
+    borderColor: "#f26f55",
     borderWidth: 2,
     margin: 16,
     padding: 8,
@@ -77,36 +91,36 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   saleDateTime: {
     fontSize: 14,
-    color: 'grey',
+    color: "grey",
   },
   descriptionContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 8,
   },
   price: {
     fontSize: 16,
-    color: "Green",
+    color: "green",
   },
   saleRating: {
     fontSize: 14,
-    color: 'grey',
+    color: "grey",
   },
   noCommentText: {
     fontSize: 14,
-    fontStyle: 'italic',
-    color: 'grey',
+    fontStyle: "italic",
+    color: "grey",
   },
 });
 

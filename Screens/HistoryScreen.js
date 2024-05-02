@@ -1,8 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, FlatList, StyleSheet, ScrollView, RefreshControl } from 'react-native';
-import { Button, Title, Card, Snackbar, Searchbar,} from 'react-native-paper';
-import SaleItem from '../Components/SaleItem';
-import { theme } from "../Styles/styles"; 
+import React, { useState, useEffect } from "react";
+import {
+  SafeAreaView,
+  FlatList,
+  StyleSheet,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
+import { Button, Title, Card, Snackbar, Searchbar } from "react-native-paper";
+import SaleItem from "../Components/SaleItem";
+import { theme } from "../Styles/styles";
 
 //API
 import axios from "axios";
@@ -10,7 +16,6 @@ import * as SecureStore from "expo-secure-store";
 import { IP_ADDRESS } from "../Functions/GetIP";
 
 const HistoryScreen = () => {
-
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -61,27 +66,34 @@ const HistoryScreen = () => {
       const apiUrl = `http://${IP_ADDRESS}:8080/api/seller/${userID}/history`;
       const config = {
         headers: {
-          Authorization: `Bearer ${userToken}`
-        }
+          Authorization: `Bearer ${userToken}`,
+        },
       };
       const response = await axios.get(apiUrl, config);
-      console.log(response);
-      
-      if(response.data === "History is empty."){
+      console.log(response.data);
+
+      if (response.data === "History is empty.") {
         setSales([]);
-      }
-      else{
+      } else {
         setSales(response.data);
       }
-      setIsLoading(false);
 
-      // Add an arbitrary "isOpen" attribute to each business
-      // TODO This is temporary!!! This should be handled by the backend
-      // const updatedBusinesses = response.data.map((business) => {
-      //   business.isOpen = true;
-      //   return business;
-      // });
-      // setBusinesses(updatedBusinesses);
+      // Sort the sales by their transaction date, newest first
+      setSales((sales) =>
+        sales.sort((a, b) => {
+          return new Date(b.transactionDate) - new Date(a.transactionDate);
+        })
+      );
+      // Display the transactionDates in a better format
+      setSales((sales) =>
+        sales.map((sale) => {
+          sale.transactionDate = new Date(
+            sale.transactionDate
+          ).toLocaleString();
+          return sale;
+        })
+      );
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching history:", error);
       setShowError(true);
@@ -108,29 +120,31 @@ const HistoryScreen = () => {
 
   const showSales = () => {
     console.log(sales);
-    try{
-      return(
-        filteredData.map((item) => (
+    if (filteredData && filteredData.length >= 0) {
+      try {
+        return filteredData.map((item) => (
           <SaleItem
             key={item.id}
-            title={item.offerName/*item.title*/}
+            title={item.offerName /*item.title*/}
             price={item.price}
             dateTime={item.transactionDate}
-            rating={item.rating || 5}
+            rating={(item.review && item.review.rating) || -1}
             customerName={item.buyerName}
-            comment={item.comment}
+            comment={item.review && item.review.comment}
           />
-      )));
+        ));
+      } catch (error) {
+        console.log(error);
+      }
     }
-    catch(error){console.log(error)}
-  }
+  };
 
   return (
-    <ScrollView 
-    // style={styles.container}
-    refreshControl={
-      <RefreshControl refreshing={isLoading} onRefresh={fetchSales} />
-    }
+    <ScrollView
+      // style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={isLoading} onRefresh={fetchSales} />
+      }
     >
       <Searchbar
         placeholder="Search Offer..."
@@ -148,7 +162,6 @@ const HistoryScreen = () => {
       >
         {errorMessage}
       </Snackbar>
-      
     </ScrollView>
   );
 };
@@ -157,11 +170,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor:"fff",
+    backgroundColor: "fff",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 16,
   },
   backButton: {

@@ -1,40 +1,50 @@
-import React, { useState } from 'react';
-import { SafeAreaView, KeyboardAvoidingView, View, StyleSheet, Image, ScrollView } from 'react-native';
-import { TextInput, Button, Text, Snackbar } from 'react-native-paper';
-import { TimePickerModal } from 'react-native-paper-dates';
-import styles, { theme } from '../Styles/styles';
-import RegisterInfoCard from '../Components/RegisterInfoCard';
+import React, { useState } from "react";
+import {
+  SafeAreaView,
+  KeyboardAvoidingView,
+  View,
+  StyleSheet,
+  Image,
+  ScrollView,
+} from "react-native";
+import { TextInput, Button, Text, Snackbar } from "react-native-paper";
+import { TimePickerModal } from "react-native-paper-dates";
+import styles, { theme } from "../Styles/styles";
+import RegisterInfoCard from "../Components/RegisterInfoCard";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { IP_ADDRESS } from "../Functions/GetIP";
 
-const logoImg = require('../assets/logo.png');
+const logoImg = require("../assets/logo.png");
 
 export default function RegisterScreen({ navigation }) {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState();
   const [confirmPassword, setConfirmPassword] = useState();
-  const [address, setAddress] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [businessName, setBusinessName] = useState('');
+  const [address, setAddress] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [businessName, setBusinessName] = useState("");
   //const [workingHours, setWorkingHours] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
 
   const [isTimePickerVisible, setIstimePickerVisible] = useState(false);
 
-  const hideTimePicker = () => {setIstimePickerVisible(false)}
-  const showTimePicker = () => {console.log("pick time")/*setIstimePickerVisible(true)*/}
+  const hideTimePicker = () => {
+    setIstimePickerVisible(false);
+  };
+  const showTimePicker = () => {
+    console.log("pick time"); /*setIstimePickerVisible(true)*/
+  };
 
   const [showFail, setShowFail] = useState(false);
   const [errorText, setErrorText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleTimeConfirm = (selectedDate) => {
-    const hours = selectedDate.getHours().toString().padStart(2, '0');
-    const minutes = selectedDate.getMinutes().toString().padStart(2, '0');
+    const hours = selectedDate.getHours().toString().padStart(2, "0");
+    const minutes = selectedDate.getMinutes().toString().padStart(2, "0");
     const formattedTime = `${hours}:${minutes}`;
     setTime(formattedTime);
     hideDatePicker();
@@ -46,28 +56,28 @@ export default function RegisterScreen({ navigation }) {
       setIsLoading(true);
       //console.log("Registering with username: ", username);
       //console.log("Sending request to ", apiUrl);
-      
-      const response = await 
-      axios.post(apiUrl, {
-        username: username,
-        email: email,
-        password: password,
-        address: address,
-        phone: phoneNumber,
-        businessName: businessName,
-        //workingHours: workingHours,
-        openingHour: startTime,
-        closingHour: endTime,
-        //locationCoordinates: "0",
-        //reservationTimeOut: 0,
-        approved: true
-      }).then((response) => {
-        console.log("Registration successful");
-        setIsLoading(false);
-        //setSuccessVisible(true);
-        navigation.navigate("Waiting");
-      });
 
+      const response = await axios
+        .post(apiUrl, {
+          username: username,
+          email: email,
+          password: password,
+          address: address,
+          phone: phoneNumber,
+          businessName: businessName,
+          //workingHours: workingHours,
+          openingHour: startTime,
+          closingHour: endTime,
+          //locationCoordinates: "0",
+          //reservationTimeOut: 0,
+          approved: true,
+        })
+        .then((response) => {
+          console.log("Registration successful");
+          setIsLoading(false);
+          //setSuccessVisible(true);
+          navigation.navigate("Waiting");
+        });
     } catch (error) {
       console.error("Error registering user:", error);
       setErrorText("Error registering user!");
@@ -79,17 +89,27 @@ export default function RegisterScreen({ navigation }) {
   const handleRegister = () => {
     // Regular expression for email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  
+
     // Regular expression for phone number validation
     const phoneRegex = /^\d{10}$/;
-  
+
     // Check if all fields are filled
-    if (!username || !email || !password || !address || !phoneNumber || !businessName || !startTime || !endTime) {//!workingHours) {
+    if (
+      !username ||
+      !email ||
+      !password ||
+      !address ||
+      !phoneNumber ||
+      !businessName ||
+      !startTime ||
+      !endTime
+    ) {
+      //!workingHours) {
       setErrorText("Please fill all the areas!");
       setShowFail(true);
       return;
     }
-  
+
     // Check if the password matches the confirm password
     if (password !== confirmPassword) {
       setErrorText("Passwords don't match!");
@@ -98,30 +118,28 @@ export default function RegisterScreen({ navigation }) {
       setConfirmPassword("");
       return;
     }
-  
+
     // Check if email is valid
     if (!emailRegex.test(email)) {
       setErrorText("Please enter a valid email address!");
       setShowFail(true);
       return;
     }
-  
+
     // Check if phone number is valid
     if (!phoneRegex.test(phoneNumber)) {
       setErrorText("Please enter a valid phone number!");
       setShowFail(true);
       return;
     }
-  
+
     // Register the user if all conditions are met
     register();
   };
 
   return (
-    
-      <SafeAreaView
-        style={styles.container}
-      >
+    <ScrollView>
+      <SafeAreaView style={styles.container}>
         <Image source={logoImg} style={styles.image} />
         <TextInput
           label="Enter Username"
@@ -208,16 +226,30 @@ export default function RegisterScreen({ navigation }) {
           hours={12}
           minutes={14}
         />
-        <Button 
-        mode="contained"
-        disabled = {isLoading}
-        onPress={() => {handleRegister();/*navigation.navigate('Waiting');*/}}>
+        <Button
+          mode="contained"
+          disabled={isLoading}
+          onPress={() => {
+            handleRegister(); /*navigation.navigate('Waiting');*/
+          }}
+        >
           Send Application Request
         </Button>
-        <Text style={styles.text} >
-          Your request will be evaluated and you will be contacted via phone number and email you provided.
-        </Text>
+        <Button
+          mode="outline"
+          disabled={isLoading}
+          onPress={() => {
+            navigation.navigate("Login");
+          }}
+          style={{ marginTop: 6 }}
+        >
+          Go Back to Login
+        </Button>
 
+        <Text style={styles.text}>
+          Your request will be evaluated and you will be contacted via phone
+          number and email you provided.
+        </Text>
         {/*Register failed, show a snackbar*/}
         <Snackbar
           visible={showFail}
@@ -228,7 +260,7 @@ export default function RegisterScreen({ navigation }) {
           {errorText}
         </Snackbar>
       </SafeAreaView>
-    
+    </ScrollView>
   );
 }
 

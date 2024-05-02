@@ -58,12 +58,16 @@ export default function OfferItem({
     // Implement logic to save changes, update the data, etc.
     console.log("Changes saved:", { tempTitle, tempDescription, tempPrice });
 
-    if(!tempTitle || !tempDescription || !tempPrice){
+    if (!tempTitle || !tempDescription || !tempPrice) {
       setShowError(true);
       setErrorMessage("Please fill all the fields!");
       return;
     }
-    if(tempTitle===editedTitle && tempDescription===editedDescription && tempPrice===editedPrice){
+    if (
+      tempTitle === editedTitle &&
+      tempDescription === editedDescription &&
+      tempPrice === editedPrice
+    ) {
       setShowError(true);
       setErrorMessage("No change is made!");
       return;
@@ -72,7 +76,8 @@ export default function OfferItem({
     // Update the main state with the edited values
     setEditedTitle(tempTitle);
     setEditedDescription(tempDescription);
-    setEditedPrice(tempPrice);
+    // Parse it to integer while passing edited price
+    setEditedPrice(parseInt(tempPrice));
 
     handleAPIModify();
     // Close the modal
@@ -91,23 +96,30 @@ export default function OfferItem({
       const apiUrl = `http://${IP_ADDRESS}:8080/api/seller/${userID}/modifyOffer/${id}`;
       const config = {
         headers: {
-          Authorization: `Bearer ${userToken}`
-        }
+          Authorization: `Bearer ${userToken}`,
+        },
       };
 
-      const response = await 
-      axios.post(apiUrl, {
-        offerName: editedTitle,
-        description: editedDescription,
-        price: editedPrice,
-        reserved: true
-      }, config).then((response) => {
-        console.log("offer editing successful");
-        console.log(response);
+      const response = await axios
+        .post(
+          apiUrl,
+          {
+            itemCount: itemsLeft,
+            pickupTimes: pickupTimes,
+            offerName: editedTitle,
+            description: editedDescription,
+            price: editedPrice,
+            reserved: true,
+          },
+          config
+        )
+        .then((response) => {
+          console.log("offer editing successful");
+          console.log(response);
 
-        hideEditModal();
-        refresh();
-      });
+          hideEditModal();
+          refresh();
+        });
     } catch (error) {
       console.error("Error editing offer:", error);
       setErrorMessage("Error editing offer:", error);
@@ -126,15 +138,14 @@ export default function OfferItem({
       const apiUrl = `http://${IP_ADDRESS}:8080/api/seller/${userID}/modifyOffer/${id}/deleteOffer`;
       const config = {
         headers: {
-          Authorization: `Bearer ${userToken}`
-        }
+          Authorization: `Bearer ${userToken}`,
+        },
       };
 
       console.log(apiUrl);
-      const response = await 
-      axios.delete(apiUrl, config).then((response) => {
+      const response = await axios.delete(apiUrl, config).then((response) => {
         console.log("offer deleted successfully");
-        
+
         setConfirmDeleteModal(false);
         hideEditModal();
         refresh();
@@ -159,15 +170,14 @@ export default function OfferItem({
       const apiUrl = `http://${IP_ADDRESS}:8080/api/seller/${userID}/markSold/${id}/${reservationID}`;
       const config = {
         headers: {
-          Authorization: `Bearer ${userToken}`
-        }
+          Authorization: `Bearer ${userToken}`,
+        },
       };
 
       console.log(apiUrl);
-      const response = await 
-      axios.post(apiUrl,{} ,config).then((response) => {
+      const response = await axios.post(apiUrl, {}, config).then((response) => {
         console.log("Reservation delivered successfully");
-        
+
         //setConfirmDeleteModal(false);
         //hideEditModal();
         hideReservationsModal();
@@ -178,7 +188,7 @@ export default function OfferItem({
       setErrorMessage("Error delivering reservation:", error);
       setShowError(true);
     }
-  }
+  };
 
   const handleDismiss = () => {
     // Reset temp values
@@ -209,11 +219,14 @@ export default function OfferItem({
         <Paragraph
           style={{ color: "gray", fontStyle: "italic", marginBottom: 10 }}
         >
-          {pickupTimes && pickupTimes.map((time) => `${time.pickupTimeStart} - ${time.pickupTimeEnd}, `)}
+          {pickupTimes &&
+            pickupTimes.map(
+              (time) => `${time.pickupTimeStart} - ${time.pickupTimeEnd}, `
+            )}
         </Paragraph>
         {/* Price, Reservations button, Items Left */}
         <View style={styles.bottomContainer}>
-          <Text style={styles.price}>{editedPrice} ₺</Text>
+          <Text style={styles.price}>₺{editedPrice}</Text>
           <TouchableOpacity onPress={onReservationsPress}>
             <Button onPress={showReservationsModal}>Reservations</Button>
           </TouchableOpacity>
@@ -242,7 +255,7 @@ export default function OfferItem({
             />
             <TextInput
               label="Edit Price"
-              value={tempPrice}
+              value={tempPrice.toString()}
               onChangeText={(text) => setTempPrice(text)}
               mode="outlined"
               keyboardType="numeric" // Opens a numerical keyboard
@@ -299,15 +312,18 @@ export default function OfferItem({
             contentContainerStyle={styles.modalContainer}
           >
             <Title style={styles.modalTitle}>Reservations</Title>
-            {/*console.log(reservations) &&*/ reservations.map((reservation) => (
+            {reservations && reservations.length === 0 && (
+              <Text>No reservations yet.</Text>
+            )}
+            {reservations.map((reservation) => (
               <View key={reservation.id} style={styles.reservationContainer}>
                 <View style={styles.reservationInfo}>
-                  <Text>{reservation.sellerName}</Text>
+                  <Text>{reservation.buyerName}</Text>
                   <Text>{reservation.timeslot}</Text>
                 </View>
                 <IconButton
-                  icon= 'check'
-                  color='green'
+                  icon="check"
+                  color="green"
                   size={24}
                   onPress={() => {
                     confirmDelivery(reservation.id);

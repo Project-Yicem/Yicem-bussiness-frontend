@@ -9,18 +9,16 @@ import {
   Platform,
   RefreshControl,
 } from "react-native";
-import { 
-  Button,
-  Snackbar,
-} from "react-native-paper";
+import { Button, Snackbar } from "react-native-paper";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import ProfileInfoCard from "../Components/ProfileInfoCard";
-import { theme } from "../Styles/styles"; 
+import { theme } from "../Styles/styles";
 
 //API
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { IP_ADDRESS } from "../Functions/GetIP";
+import ProfilePicturePicker from "../Components/ProfilePicturePicker";
 
 const ProfileScreen = () => {
   // Mock business information
@@ -35,7 +33,7 @@ const ProfileScreen = () => {
   //   openingTime: "08.00",
   //   closingTime: "17.00",
   // };
-  const [businessInfo,setBusinessInfo] = useState([]);
+  const [businessInfo, setBusinessInfo] = useState([]);
   //   businessName: "Your Business Name",
   //   email: "business@example.com",
   //   password: "********", // Masked password
@@ -49,79 +47,90 @@ const ProfileScreen = () => {
 
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [chosenProfilePic, setChosenProfilePic] = useState("");
 
   const putBusinessName = (value) => {
-    if(!value){
+    if (!value) {
       setErrorMessage("Please enter a valid value!");
       setShowError(true);
       return 0;
     }
     const data = {
-      businessName: value
+      businessName: value,
     };
     handleAPIprofileChange(data);
     return 1;
-  }
+  };
 
   const putAddress = (value) => {
-    if(!value){
+    if (!value) {
       setErrorMessage("Please enter a valid value!");
       setShowError(true);
       return 0;
     }
     const data = {
-      address: value
+      address: value,
     };
     handleAPIprofileChange(data);
     return 1;
-  }
+  };
 
   const putPhoneNumber = (value) => {
     const phoneRegex = /^\d{10}$/;
 
-    if(!value || !phoneRegex.test(value)){
+    if (!value || !phoneRegex.test(value)) {
       setErrorMessage("Please enter a valid number!");
       setShowError(true);
       return 0;
     }
     const data = {
-      phone: value
+      phone: value,
     };
     handleAPIprofileChange(data);
     return 1;
-  }
+  };
 
   const putOpenHours = (value) => {
     const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-    if(!value.openingTime || !value.closingTime ){
+    if (!value.openingTime || !value.closingTime) {
       setErrorMessage("Please enter valid values!");
       setShowError(true);
       return 0;
     }
-    if(!timeRegex.test(value.openingTime) || !timeRegex.test(value.closingTime)){
-      setErrorMessage("Please enter time in HH:MM format!");
+    if (
+      !timeRegex.test(value.openingTime) ||
+      !timeRegex.test(value.closingTime)
+    ) {
+      setErrorMessage("Please enter a valid time in HH:MM format");
       setShowError(true);
       return 0;
     }
 
     const data = {
       openingHour: value.openingTime,
-      closingHour: value.closingTime
+      closingHour: value.closingTime,
     };
     handleAPIprofileChange(data);
     return 1;
-  }
+  };
 
   const putImage = (value) => {
-    //TODO convert image to string
-    console.log("image enter");
-    //handleAPIprofileChange(data);
-  }
+    if (!value) {
+      setErrorMessage("Please choose a profile picture!");
+      setShowError(true);
+      return 0;
+    }
+    const data = {
+      logo: value,
+    };
+    handleAPIprofileChange(data);
+    setChosenProfilePic("");
+    return 1;
+  };
 
   const changePassword = async (value) => {
-    if(!value.oldPassword || !value.newPassword){
+    if (!value.oldPassword || !value.newPassword) {
       setErrorMessage("Please enter valid passwords!");
       setShowError(true);
       return 0;
@@ -131,7 +140,7 @@ const ProfileScreen = () => {
 
       const data = {
         oldPassword: value.oldPassword,
-        newPassword:value.newPassword
+        newPassword: value.newPassword,
       };
 
       const userToken = await SecureStore.getItemAsync("userToken");
@@ -139,20 +148,21 @@ const ProfileScreen = () => {
       const apiUrl = `http://${IP_ADDRESS}:8080/api/seller/update-password`;
       const config = {
         headers: {
-          Authorization: `Bearer ${userToken}`
-        }
+          Authorization: `Bearer ${userToken}`,
+        },
       };
 
       // Create an object to hold the data
-    
-    console.log("edited passwords: ",data);
-      const response = await 
-      axios.put(apiUrl, data, config).then((response) => {
-        //console.log("changed ", field," successfully!");
-        console.log(response);
-        setIsRefreshing(false);
-        fetchProfile();
-      });
+
+      console.log("edited passwords: ", data);
+      const response = await axios
+        .put(apiUrl, data, config)
+        .then((response) => {
+          //console.log("changed ", field," successfully!");
+          console.log(response);
+          setIsRefreshing(false);
+          fetchProfile();
+        });
     } catch (error) {
       console.error("Error updating password:", error);
       setIsRefreshing(false);
@@ -169,25 +179,26 @@ const ProfileScreen = () => {
       const apiUrl = `http://${IP_ADDRESS}:8080/api/seller/update`;
       const config = {
         headers: {
-          Authorization: `Bearer ${userToken}`
-        }
+          Authorization: `Bearer ${userToken}`,
+        },
       };
 
       // Create an object to hold the data
-    
-    console.log("edited data: ",data);
-      const response = await 
-      axios.put(apiUrl, data, config).then((response) => {
-        //console.log("changed ", field," successfully!");
-        console.log(response);
-        setIsRefreshing(false);
-        fetchProfile();
-      });
+
+      console.log("edited data: ", data);
+      const response = await axios
+        .put(apiUrl, data, config)
+        .then((response) => {
+          //console.log("changed ", field," successfully!");
+          console.log(response);
+          setIsRefreshing(false);
+          fetchProfile();
+        });
     } catch (error) {
       console.error("Error updating profile:", error);
       setIsRefreshing(false);
     }
-  }
+  };
 
   const fetchProfile = async () => {
     try {
@@ -203,12 +214,12 @@ const ProfileScreen = () => {
         headers: {
           Authorization: `Bearer ${userToken}`,
           "Content-Type": "application/json",
-        }
+        },
       };
       const response = await axios.get(apiUrl, config);
       console.log(response);
 
-      if (parseInt(response.headers['content-length']) === 0) {
+      if (parseInt(response.headers["content-length"]) === 0) {
         setBusinessInfo([]);
       } else {
         setBusinessInfo(response.data);
@@ -229,14 +240,13 @@ const ProfileScreen = () => {
       setErrorMessage("Error fetching offers!");
       setIsRefreshing(false);
     }
-  }
+  };
 
   useEffect(() => {
     fetchProfile();
   }, []);
 
-  useEffect(() => {
-  }, [businessInfo]);
+  useEffect(() => {}, [businessInfo]);
 
   return (
     <KeyboardAvoidingView
@@ -249,6 +259,21 @@ const ProfileScreen = () => {
         }
       >
         <View style={styles.profileContainer}>
+          <View>
+            <ProfileInfoCard
+              title="Profile Picture"
+              isProfilePicture={true}
+              info={businessInfo.logo}
+            />
+            <View style={{ marginBottom: 12 }}>
+              <ProfilePicturePicker
+                profilePicture={chosenProfilePic}
+                setProfilePicture={setChosenProfilePic}
+                putImage={putImage}
+              />
+            </View>
+          </View>
+
           <ProfileInfoCard
             title="Business Name"
             info={businessInfo.businessName}
@@ -277,19 +302,19 @@ const ProfileScreen = () => {
             onEditSave={putOpenHours}
             isTimeRange={true}
           />
-          <ProfileInfoCard
-            title="Profile Picture"
-            isProfilePicture={true}
-            info={businessInfo.logo}
-            isEditable={true}
-            onEditSave={putImage}
-          />
-          <View style={{borderWidth: 2, borderColor: "#f26f55", borderRadius: 10, backgroundColor: "#ffffff",}}>
+          <View
+            style={{
+              borderWidth: 2,
+              borderColor: "#f26f55",
+              borderRadius: 10,
+              backgroundColor: "#ffffff",
+            }}
+          >
             <ProfileInfoCard
               title="Change Password"
               info={{
-                oldPassword:"",
-                newPassword:""
+                oldPassword: "",
+                newPassword: "",
               }}
               isEditable={true}
               onEditSave={changePassword}
@@ -322,13 +347,13 @@ const ProfileScreen = () => {
         </View>
       </ScrollView>
       <Snackbar
-          visible={showError}
-          onDismiss={() => setShowError(false)}
-          onIconPress={() => setShowError(false)}
-          duration={Snackbar.LENGTH_SHORT}
-        >
-          {errorMessage}
-        </Snackbar>
+        visible={showError}
+        onDismiss={() => setShowError(false)}
+        onIconPress={() => setShowError(false)}
+        duration={Snackbar.LENGTH_SHORT}
+      >
+        {errorMessage}
+      </Snackbar>
     </KeyboardAvoidingView>
   );
 };
@@ -348,7 +373,7 @@ const styles = StyleSheet.create({
   profilePicture: {
     width: 100,
     height: 100,
-    borderRadius: 50,
+    borderRadius: 8,
     alignSelf: "center",
     marginBottom: 16,
   },

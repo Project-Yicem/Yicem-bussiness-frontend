@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, ScrollView, StyleSheet, View, RefreshControl } from "react-native";
+import {
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  View,
+  RefreshControl,
+} from "react-native";
 import {
   Button,
   Modal,
@@ -12,7 +18,7 @@ import {
   Searchbar,
 } from "react-native-paper";
 import OfferItem from "../Components/OfferItem";
-import { theme } from "../Styles/styles"; 
+import { theme } from "../Styles/styles";
 
 //API
 import axios from "axios";
@@ -41,14 +47,14 @@ export default function OffersScreen({ navigation }) {
     setNewPrice(0);
     setNewTotalItems(0);
     selectedPickupTimes([]);
-  }
+  };
 
   const [isModalVisible, setModalVisible] = useState(false);
   const showModal = () => setModalVisible(true);
   const hideModal = () => setModalVisible(false);
 
-  const openingTime = "10.45"; // Example opening time (in 24-hour format)
-  const closingTime = "16.40"; // Example closing time (in 24-hour format)
+  const openingTime = "10:45"; // Example opening time (in 24-hour format)
+  const closingTime = "16:40"; // Example closing time (in 24-hour format)
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -68,16 +74,15 @@ export default function OffersScreen({ navigation }) {
       const apiUrl = `http://${IP_ADDRESS}:8080/api/seller/${userID}/offers`;
       const config = {
         headers: {
-          Authorization: `Bearer ${userToken}`
-        }
+          Authorization: `Bearer ${userToken}`,
+        },
       };
       const response = await axios.get(apiUrl, config);
       console.log(response);
-      
-      if(response.data === "Offer list is empty."){
+
+      if (response.data === "Offer list is empty.") {
         setOffers([]);
-      }
-      else{
+      } else {
         setOffers(response.data);
       }
       setIsOffersLoading(false);
@@ -99,26 +104,25 @@ export default function OffersScreen({ navigation }) {
 
   //add offers
   const addOffer = async () => {
-
-    if(!newTitle || !newDescription || !newPrice || !newTotalItems){
+    if (!newTitle || !newDescription || !newPrice || !newTotalItems) {
       setErrorMessage("please fill all the fields!");
       setShowError(true);
       return;
     }
 
-    if(newPrice == 0){
+    if (newPrice == 0) {
       setErrorMessage("please enter a valid price!");
       setShowError(true);
       return;
     }
 
-    if(newTotalItems == 0){
+    if (newTotalItems == 0) {
       setErrorMessage("Please include at least one item!");
       setShowError(true);
       return;
     }
-    
-    if(!selectedPickupTimes || selectedPickupTimes.length === 0){
+
+    if (!selectedPickupTimes || selectedPickupTimes.length === 0) {
       setErrorMessage("please select at least one pickup timeslot!");
       setShowError(true);
       return;
@@ -135,31 +139,36 @@ export default function OffersScreen({ navigation }) {
       const apiUrl = `http://${IP_ADDRESS}:8080/api/seller/${userID}/addOffer`;
       const config = {
         headers: {
-          Authorization: `Bearer ${userToken}`
-        }
+          Authorization: `Bearer ${userToken}`,
+        },
       };
-      const response = await 
-      axios.post(apiUrl, {
-        offerName: newTitle,
-        description: newDescription,
-        price: newPrice,
-        itemCount: newTotalItems,
-        reserved: true,
-        pickupTimes: selectedPickupTimes.map(time => {
-          const [startTime, endTime] = time.split("-");
-          return {
-            pickupTimeStart: startTime.trim(),
-            pickupTimeEnd: endTime.trim()
-          };
-        }),
-        //mysteryBox: true,
-      }, config).then((response) => {
-        console.log("offer adding successful");
-        console.log(response);
-        setIsOffersLoading(false);
-        hideModal();  //setSuccessVisible(true);
-        fetchOffers();
-      });
+      const response = await axios
+        .post(
+          apiUrl,
+          {
+            offerName: newTitle,
+            description: newDescription,
+            price: newPrice,
+            itemCount: newTotalItems,
+            reserved: true,
+            pickupTimes: selectedPickupTimes.map((time) => {
+              const [startTime, endTime] = time.split("-");
+              return {
+                pickupTimeStart: startTime.trim(),
+                pickupTimeEnd: endTime.trim(),
+              };
+            }),
+            //mysteryBox: true,
+          },
+          config
+        )
+        .then((response) => {
+          console.log("offer adding successful");
+          console.log(response);
+          setIsOffersLoading(false);
+          hideModal(); //setSuccessVisible(true);
+          fetchOffers();
+        });
     } catch (error) {
       console.error("Error adding offers:", error);
       setIsOffersLoading(false);
@@ -183,8 +192,8 @@ export default function OffersScreen({ navigation }) {
   }, [offers, searchQuery]);
 
   const generatePickupTimes = (openingTime, closingTime) => {
-    const [openingHour, openingMinute] = openingTime.split(".").map(Number);
-    const [closingHour, closingMinute] = closingTime.split(".").map(Number);
+    const [openingHour, openingMinute] = openingTime.split(":").map(Number);
+    const [closingHour, closingMinute] = closingTime.split(":").map(Number);
 
     let currentHour = Math.floor(openingHour); // Start from the nearest hour before the opening time
     let currentMinute = 0;
@@ -222,9 +231,8 @@ export default function OffersScreen({ navigation }) {
       return <Text>No Offers</Text>;
     }
 
-    try{
+    try {
       return filteredData.map((item) => (
-        
         <OfferItem
           key={item.id}
           id={item.id}
@@ -240,7 +248,7 @@ export default function OffersScreen({ navigation }) {
           refresh={fetchOffers}
         />
       ));
-    } catch(error){
+    } catch (error) {
       return;
     }
   };
@@ -249,7 +257,10 @@ export default function OffersScreen({ navigation }) {
     <SafeAreaView>
       <ScrollView
         refreshControl={
-          <RefreshControl refreshing={isOffersLoading} onRefresh={fetchOffers} />
+          <RefreshControl
+            refreshing={isOffersLoading}
+            onRefresh={fetchOffers}
+          />
         }
       >
         {/* {isOffersLoading &&
@@ -265,17 +276,17 @@ export default function OffersScreen({ navigation }) {
           style={styles.searchBar}
         />
         {renderOffers()}
-          <Button
-            icon="plus"
-            mode="contained"
-            onPress={() => {
-              console.log("Add Offer pressed");
-              showModal();
-            }}
-            style={styles.button}
-          >
-            Add Offer
-          </Button>
+        <Button
+          icon="plus"
+          mode="contained"
+          onPress={() => {
+            console.log("Add Offer pressed");
+            showModal();
+          }}
+          style={styles.button}
+        >
+          Add Offer
+        </Button>
       </ScrollView>
       <Portal>
         <Modal
@@ -334,7 +345,7 @@ export default function OffersScreen({ navigation }) {
             ))}
           </ScrollView>
           <Button
-            onPress={addOffer/*handleSaveChanges*/}
+            onPress={addOffer /*handleSaveChanges*/}
             mode="contained"
             style={styles.button}
           >
@@ -399,116 +410,115 @@ const styles = StyleSheet.create({
   },
 });
 
-  //  const [dummyOffers, setDummyOffers] = useState([
-  //   {
-  //     id: "1",
-  //     title: "Pasty Box",
-  //     description: "Salted Bagel, Sandwich, Bread",
-  //     price: "$5.99",
-  //     itemsLeft: 5,
-  //     pickupTimes: ["10.00-11.00", "11.00-12.00"],
-  //     reservations: [
-  //       {
-  //         id: "1",
-  //         name: "John Doe",
-  //         pickupTime: "10.00-11.00",
-  //         isSold: false,
-  //       },
-  //       {
-  //         id: "2",
-  //         name: "Jane Doe",
-  //         pickupTime: "11.00-12.00",
-  //         isSold: false,
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: "2",
-  //     title: "Cafe Out Exclusive Box",
-  //     description: "Specials",
-  //     price: "$12.99",
-  //     itemsLeft: 10,
-  //     pickupTimes: ["12.00-13.00", "13.00-14.00", "14.00-15.00", "15.00-16.00"],
-  //     reservations: [
-  //       {
-  //         id: "3",
-  //         name: "Alice Doe",
-  //         pickupTime: "12.00-13.00",
-  //         isSold: false,
-  //       },
-  //       {
-  //         id: "4",
-  //         name: "Bob Doe",
-  //         pickupTime: "13.00-14.00",
-  //         isSold: true,
-  //       },
-  //       {
-  //         id: "5",
-  //         name: "Eve Doe",
-  //         pickupTime: "14.00-15.00",
-  //         isSold: false,
-  //       },
-  //       {
-  //         id: "6",
-  //         name: "Mallory Doe",
-  //         pickupTime: "15.00-16.00",
-  //         isSold: true,
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: "3",
-  //     title: "Sweet Box",
-  //     description: "Donut, Cookie, Muffin",
-  //     price: "$0.99",
-  //     itemsLeft: 3,
-  //     pickupTimes: ["16.00-17.00", "17.00-18.00", "18.00-19.00"],
-  //     reservations: [
-  //       {
-  //         id: "7",
-  //         name: "Charlie Doe",
-  //         pickupTime: "16.00-17.00",
-  //         isSold: false,
-  //       },
-  //       {
-  //         id: "8",
-  //         name: "David Doe",
-  //         pickupTime: "17.00-18.00",
-  //         isSold: false,
-  //       },
-  //       {
-  //         id: "9",
-  //         name: "Frank Doe",
-  //         pickupTime: "18.00-19.00",
-  //         isSold: true,
-  //       },
-  //     ],
-  //   },
-  //   // Add more dummy offers as needed
-  // ]);
+//  const [dummyOffers, setDummyOffers] = useState([
+//   {
+//     id: "1",
+//     title: "Pasty Box",
+//     description: "Salted Bagel, Sandwich, Bread",
+//     price: "$5.99",
+//     itemsLeft: 5,
+//     pickupTimes: ["10.00-11.00", "11.00-12.00"],
+//     reservations: [
+//       {
+//         id: "1",
+//         name: "John Doe",
+//         pickupTime: "10.00-11.00",
+//         isSold: false,
+//       },
+//       {
+//         id: "2",
+//         name: "Jane Doe",
+//         pickupTime: "11.00-12.00",
+//         isSold: false,
+//       },
+//     ],
+//   },
+//   {
+//     id: "2",
+//     title: "Cafe Out Exclusive Box",
+//     description: "Specials",
+//     price: "$12.99",
+//     itemsLeft: 10,
+//     pickupTimes: ["12.00-13.00", "13.00-14.00", "14.00-15.00", "15.00-16.00"],
+//     reservations: [
+//       {
+//         id: "3",
+//         name: "Alice Doe",
+//         pickupTime: "12.00-13.00",
+//         isSold: false,
+//       },
+//       {
+//         id: "4",
+//         name: "Bob Doe",
+//         pickupTime: "13.00-14.00",
+//         isSold: true,
+//       },
+//       {
+//         id: "5",
+//         name: "Eve Doe",
+//         pickupTime: "14.00-15.00",
+//         isSold: false,
+//       },
+//       {
+//         id: "6",
+//         name: "Mallory Doe",
+//         pickupTime: "15.00-16.00",
+//         isSold: true,
+//       },
+//     ],
+//   },
+//   {
+//     id: "3",
+//     title: "Sweet Box",
+//     description: "Donut, Cookie, Muffin",
+//     price: "$0.99",
+//     itemsLeft: 3,
+//     pickupTimes: ["16.00-17.00", "17.00-18.00", "18.00-19.00"],
+//     reservations: [
+//       {
+//         id: "7",
+//         name: "Charlie Doe",
+//         pickupTime: "16.00-17.00",
+//         isSold: false,
+//       },
+//       {
+//         id: "8",
+//         name: "David Doe",
+//         pickupTime: "17.00-18.00",
+//         isSold: false,
+//       },
+//       {
+//         id: "9",
+//         name: "Frank Doe",
+//         pickupTime: "18.00-19.00",
+//         isSold: true,
+//       },
+//     ],
+//   },
+//   // Add more dummy offers as needed
+// ]);
 
-  // const handleSaveChanges = () => {
-  //   const newOffer = {
-  //     id: (dummyOffers.length + 1).toString(),
-  //     title: newTitle,
-  //     description: newDescription,
-  //     price: newPrice,
-  //     itemsLeft: parseInt(newTotalItems) || 0,
-  //     pickupTimes: selectedPickupTimes,
-  //     reservations: []
-  //   };
+// const handleSaveChanges = () => {
+//   const newOffer = {
+//     id: (dummyOffers.length + 1).toString(),
+//     title: newTitle,
+//     description: newDescription,
+//     price: newPrice,
+//     itemsLeft: parseInt(newTotalItems) || 0,
+//     pickupTimes: selectedPickupTimes,
+//     reservations: []
+//   };
 
-  //   console.log("Changes saved:", newOffer);
+//   console.log("Changes saved:", newOffer);
 
-  //   setDummyOffers((prevOffers) => [...prevOffers, newOffer]);
+//   setDummyOffers((prevOffers) => [...prevOffers, newOffer]);
 
-  //   console.log(dummyOffers);
+//   console.log(dummyOffers);
 
-
-  //   setNewTitle("");
-  //   setNewDescription("");
-  //   setNewPrice(0);
-  //   setNewTotalItems(0);
-  //   setSelectedPickupTimes([]);
-  //   hideModal();
-  // };
+//   setNewTitle("");
+//   setNewDescription("");
+//   setNewPrice(0);
+//   setNewTotalItems(0);
+//   setSelectedPickupTimes([]);
+//   hideModal();
+// };
