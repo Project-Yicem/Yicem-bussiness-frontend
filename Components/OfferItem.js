@@ -1,5 +1,5 @@
 //OfferItem.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import {
   Card,
@@ -58,6 +58,15 @@ export default function OfferItem({
     // Implement logic to save changes, update the data, etc.
     console.log("Changes saved:", { tempTitle, tempDescription, tempPrice });
 
+    //const positiveIntegerRegex = /^[1-9]\d*$/;
+    const priceRegex = /^\d+(\.\d{1,2})?$/;
+
+    if (!priceRegex.test(tempPrice)) {
+      setErrorMessage("please enter a valid price!");
+      setShowError(true);
+      return;
+    }
+
     if (!tempTitle || !tempDescription || !tempPrice) {
       setShowError(true);
       setErrorMessage("Please fill all the fields!");
@@ -77,9 +86,9 @@ export default function OfferItem({
     setEditedTitle(tempTitle);
     setEditedDescription(tempDescription);
     // Parse it to integer while passing edited price
-    setEditedPrice(parseInt(tempPrice));
+    setEditedPrice(parseFloat(tempPrice));
 
-    handleAPIModify();
+    await handleAPIModify();
     // Close the modal
 
     // setTempTitle(title);
@@ -99,17 +108,17 @@ export default function OfferItem({
           Authorization: `Bearer ${userToken}`,
         },
       };
-
+      console.log(tempTitle, tempDescription, tempPrice, apiUrl);
       const response = await axios
         .post(
           apiUrl,
           {
             itemCount: itemsLeft,
             pickupTimes: pickupTimes,
-            offerName: editedTitle,
-            description: editedDescription,
-            price: editedPrice,
-            reserved: true,
+            offerName: tempTitle,
+            description: tempDescription,
+            price: tempPrice,
+            // reserved: true,
           },
           config
         )
@@ -200,6 +209,12 @@ export default function OfferItem({
     hideEditModal();
   };
 
+  useEffect(() => {
+    setEditedPrice(price);
+    setEditedDescription(description);
+    setEditedPrice(parseFloat(price));
+  },[title, description, price, pickupTimes, itemsLeft, reservations])
+
   return (
     <Card style={styles.offerContainer}>
       <Card.Content style={styles.contentContainer}>
@@ -256,7 +271,7 @@ export default function OfferItem({
             <TextInput
               label="Edit Price"
               value={tempPrice.toString()}
-              onChangeText={(text) => setTempPrice(text)}
+              onChangeText={(text) => setTempPrice(parseFloat(text))}
               mode="outlined"
               keyboardType="numeric" // Opens a numerical keyboard
               style={styles.input}

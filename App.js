@@ -1,23 +1,22 @@
-import React, { useEffect } from "react";
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
+import React, {useEffect} from 'react';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 
 // Import your screens
-import LoginScreen from "./Screens/LoginScreen";
-import RegisterScreen from "./Screens/RegisterScreen";
-import WaitingScreen from "./Screens/WaitingScreen";
-import OffersScreen from "./Screens/OfferScreen";
-import HistoryScreen from "./Screens/HistoryScreen";
-import ProfileScreen from "./Screens/ProfileScreen";
-import MainTabs from "./MainTabs";
+import LoginScreen from './Screens/LoginScreen';
+import RegisterScreen from './Screens/RegisterScreen';
+import WaitingScreen from './Screens/WaitingScreen';
+import OffersScreen from './Screens/OfferScreen';
+import HistoryScreen from './Screens/HistoryScreen';
+import ProfileScreen from './Screens/ProfileScreen';
+import MainTabs from './MainTabs';
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 import { IP_ADDRESS } from "./Functions/GetIP";
 
-import styles, { theme } from "./Styles/styles";
-import MapLocationPickerScreen from "./Screens/MapLocationPickerScreen";
+import styles, { theme } from './Styles/styles';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,7 +30,7 @@ export default function App() {
   );
 }
 
-function AppContent() {
+function AppContent(){
   const navigation = useNavigation();
 
   const checkToken = async () => {
@@ -41,7 +40,7 @@ function AppContent() {
     // Check if the user is already logged in
     // If so, navigate to the MainHome screen
     // If not, navigate to the Login screen
-    const userToken = await SecureStore.getItemAsync("userToken"); //PRONE TO FAIL
+    const userToken = await SecureStore.getItemAsync("userToken");          //PRONE TO FAIL
     if (userToken) {
       console.log(userToken);
       navigation.navigate("Login");
@@ -55,7 +54,7 @@ function AppContent() {
 
     checkToken();
   }, []);
-  return (
+  return(
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
@@ -65,13 +64,11 @@ function AppContent() {
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Waiting" component={WaitingScreen} />
       <Stack.Screen name="MainHome" component={MainTabs} />
-      <Stack.Screen
-        name="MapLocationPickerScreen"
-        component={MapLocationPickerScreen}
-      />
     </Stack.Navigator>
   );
 }
+
+
 
 // import React from 'react';
 // import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
@@ -128,6 +125,7 @@ function AppContent() {
 //   );
 // }
 
+
 // import React from 'react';
 // import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 // import { NavigationContainer } from '@react-navigation/native';
@@ -158,6 +156,8 @@ function AppContent() {
 //     </PaperProvider>
 //   );
 // }
+
+
 
 // import React from 'react';
 // import { NavigationContainer } from '@react-navigation/native';

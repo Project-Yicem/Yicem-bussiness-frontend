@@ -8,12 +8,13 @@ import {
   ScrollView,
 } from "react-native";
 import { TextInput, Button, Text, Snackbar } from "react-native-paper";
-import { TimePickerModal } from "react-native-paper-dates";
+import { TimePicker, TimePickerModal } from "react-native-paper-dates";
 import styles, { theme } from "../Styles/styles";
 import RegisterInfoCard from "../Components/RegisterInfoCard";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { IP_ADDRESS } from "../Functions/GetIP";
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const logoImg = require("../assets/logo.png");
 
@@ -25,32 +26,51 @@ export default function RegisterScreen({ navigation }) {
   const [address, setAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [businessName, setBusinessName] = useState("");
-  //const [workingHours, setWorkingHours] = useState('');
+
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
 
-  const [isTimePickerVisible, setIstimePickerVisible] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [focusedInput, setFocusedInput] = useState("");
 
-  const hideTimePicker = () => {
-    setIstimePickerVisible(false);
+  const onDateTimeChange = (event, selectedDate) => {
+
+    const currentTime = selectedDate || new Date();
+    setShowTimePicker(false);
+
+    setSelectedDate(currentTime);
+    const hours = currentTime.getHours().toString().padStart(2, "0");
+    const minutes = currentTime.getMinutes().toString().padStart(2, "0");
+    const formattedTime = `${hours}:${minutes}`;
+    // Check if startTime or endTime input is focused and update accordingly
+    if (focusedInput === "startTime") {
+      setStartTime(formattedTime);
+    } else if (focusedInput === "endTime") {
+      setEndTime(formattedTime);
+    }
   };
-  const showTimePicker = () => {
-    console.log("pick time"); /*setIstimePickerVisible(true)*/
+
+  const onDateTimeFocus = (input) => {
+    setShowTimePicker(true);
+    setFocusedInput(input); // Set which input is currently focused
   };
 
   const [showFail, setShowFail] = useState(false);
   const [errorText, setErrorText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleTimeConfirm = (selectedDate) => {
-    const hours = selectedDate.getHours().toString().padStart(2, "0");
-    const minutes = selectedDate.getMinutes().toString().padStart(2, "0");
-    const formattedTime = `${hours}:${minutes}`;
-    setTime(formattedTime);
-    hideTimePicker();
-  };
+  // const handleTimeConfirm = (selectedDate) => {
+  //   const hours = selectedDate.getHours().toString().padStart(2, "0");
+  //   const minutes = selectedDate.getMinutes().toString().padStart(2, "0");
+  //   const formattedTime = `${hours}:${minutes}`;
+  //   setTime(formattedTime);
+  //   hideDatePicker();
+  // };
+
   const register = async () => {
     const apiUrl = `http://${IP_ADDRESS}:8080/api/auth/signup/seller`;
+
     try {
       setIsLoading(true);
       //console.log("Registering with username: ", username);
@@ -86,11 +106,10 @@ export default function RegisterScreen({ navigation }) {
   };
 
   const handleRegister = () => {
-    // Regular expression for email validation
+    // Regular expressions
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    // Regular expression for phone number validation
     const phoneRegex = /^\d{10}$/;
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
     // Check if all fields are filled
     if (
@@ -128,6 +147,11 @@ export default function RegisterScreen({ navigation }) {
     // Check if phone number is valid
     if (!phoneRegex.test(phoneNumber)) {
       setErrorText("Please enter a valid phone number!");
+      setShowFail(true);
+      return;
+    }
+    if(!timeRegex.test(startTime) || !timeRegex.test(endTime)){
+      setErrorText("Please enter a valid time interval, time format is HH:MM!");
       setShowFail(true);
       return;
     }
@@ -196,35 +220,28 @@ export default function RegisterScreen({ navigation }) {
           <TextInput
             label="Start Time"
             value={startTime}
-            onFocus={showTimePicker}
-            onChangeText={(text) => setStartTime(text)}
+            onFocus={() => onDateTimeFocus("startTime")}
             mode="outlined"
             style={styles.timeInput}
           />
           <TextInput
             label="End Time"
             value={endTime}
-            onFocus={showTimePicker}
-            onChangeText={(text) => setEndTime(text)}
+            onFocus={() => onDateTimeFocus("endTime")}
             mode="outlined"
             style={styles.timeInput}
           />
         </View>
-        {/* <TextInput
-          label="Enter Working Hours"
-          value={workingHours}
-          onFocus={showTimePicker}
-          onChangeText={(text) => setWorkingHours(text)}
-          mode="outlined"
-          style={styles.input}
-        /> */}
-        <TimePickerModal
-          visible={isTimePickerVisible}
-          onDismiss={hideTimePicker}
-          onConfirm={handleTimeConfirm}
-          hours={12}
-          minutes={14}
+        {showTimePicker && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={selectedDate}
+          mode="time"
+          is24Hour={true}
+          display="default"
+          onChange={onDateTimeChange}
         />
+      )}
         <Button
           mode="contained"
           disabled={isLoading}

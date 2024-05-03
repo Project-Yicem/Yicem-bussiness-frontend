@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, TextInput } from "react-native";
 import { IconButton, Button } from "react-native-paper";
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const ProfileInfoCard = ({
   title,
@@ -12,6 +13,32 @@ const ProfileInfoCard = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedInfo, setEditedInfo] = useState(info);
+
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [focusedInput, setFocusedInput] = useState("");
+
+  const onDateTimeChange = (event, selectedDate) => {
+
+    const currentTime = selectedDate || new Date();
+    setShowTimePicker(false);
+
+    setSelectedDate(currentTime);
+    const hours = currentTime.getHours().toString().padStart(2, "0");
+    const minutes = currentTime.getMinutes().toString().padStart(2, "0");
+    const formattedTime = `${hours}:${minutes}`;
+    // Check if startTime or endTime input is focused and update accordingly
+    if (focusedInput === "startTime") {
+      setEditedInfo({...editedInfo, openingTime: formattedTime});//setStartTime(formattedTime);
+    } else if (focusedInput === "endTime") {
+      setEditedInfo({...editedInfo, closingTime: formattedTime});
+    }
+  };
+
+  const onDateTimeFocus = (input) => {
+    setShowTimePicker(true);
+    setFocusedInput(input); // Set which input is currently focused
+  };
 
   useEffect(() => {
     setEditedInfo(info);
@@ -42,35 +69,34 @@ const ProfileInfoCard = ({
         <Text style={styles.title}>{title}</Text>
         {isProfilePicture ? (
           <View style={styles.profilePictureContainer}>
-            {info ? (
-              <Image source={{ uri: info }} style={styles.profilePicture} />
-            ) : (
-              <Image
-                source={require("../assets/splash.png")}
-                style={styles.profilePicture}
-              />
-            )}
+            <Image source={{ uri: info }} style={styles.profilePicture} />
           </View>
         ) : isTimeRange ? (
           <View style={styles.editableText}>
             <Text>Opening Time</Text>
             <TextInput
               value={editedInfo.openingTime}
-              onChangeText={(text) =>
-                setEditedInfo({ ...editedInfo, openingTime: text })
-              }
+              onFocus={() => onDateTimeFocus("startTime")}
               editable={isEditing}
               style={styles.editableText}
             />
             <Text>Closing Time</Text>
             <TextInput
               value={editedInfo.closingTime}
-              onChangeText={(text) =>
-                setEditedInfo({ ...editedInfo, closingTime: text })
-              }
+              onFocus={() => onDateTimeFocus("closeTime")}
               editable={isEditing}
               style={styles.editableText}
             />
+            {showTimePicker && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={selectedDate}
+                mode="time"
+                is24Hour={true}
+                display="default"
+                onChange={onDateTimeChange}
+              />
+            )}
           </View>
         ) : isPassword ? (
           isEditing ? (
