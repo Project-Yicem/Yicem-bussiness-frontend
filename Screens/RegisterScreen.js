@@ -47,10 +47,11 @@ export default function RegisterScreen({ navigation }) {
     const minutes = selectedDate.getMinutes().toString().padStart(2, "0");
     const formattedTime = `${hours}:${minutes}`;
     setTime(formattedTime);
-    hideTimePicker();
+    hideDatePicker();
   };
   const register = async () => {
     const apiUrl = `http://${IP_ADDRESS}:8080/api/auth/signup/seller`;
+
     try {
       setIsLoading(true);
       //console.log("Registering with username: ", username);
@@ -86,11 +87,10 @@ export default function RegisterScreen({ navigation }) {
   };
 
   const handleRegister = () => {
-    // Regular expression for email validation
+    // Regular expressions
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    // Regular expression for phone number validation
     const phoneRegex = /^\d{10}$/;
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
     // Check if all fields are filled
     if (
@@ -128,6 +128,11 @@ export default function RegisterScreen({ navigation }) {
     // Check if phone number is valid
     if (!phoneRegex.test(phoneNumber)) {
       setErrorText("Please enter a valid phone number!");
+      setShowFail(true);
+      return;
+    }
+    if(!timeRegex.test(startTime) || !timeRegex.test(endTime)){
+      setErrorText("Please enter a valid time interval, time format is HH:MM!");
       setShowFail(true);
       return;
     }

@@ -41,6 +41,9 @@ export default function LoginScreen({ navigation }) {
       // Store the token using expo-secure-store
       await SecureStore.setItemAsync("userToken", token);
       await SecureStore.setItemAsync("userID", userID);
+
+      await fetchInfo(token, userID);
+
       setIsLoginLoading(false);
       navigation.navigate("MainHome");
     } catch (error) {
@@ -59,6 +62,28 @@ export default function LoginScreen({ navigation }) {
     login();
     setIsLoginLoading(false);
   };
+
+  const fetchInfo = async (userToken, userID) => {
+    try {
+      const apiUrl = `http://${IP_ADDRESS}:8080/api/seller/${userID}`;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          "Content-Type": "application/json",
+        },
+      };
+      const response = await axios.get(apiUrl, config);
+      console.log(response);
+      await SecureStore.setItemAsync("openingHour", response.data.openingHour);
+      await SecureStore.setItemAsync("closingHour", response.data.closingHour);
+      
+    } catch (error) {
+      console.error("Error getting profile info", error);
+      setShowError(true);
+      setErrorMessage("Error getting profile info", error);
+      setIsRefreshing(false);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.container}>

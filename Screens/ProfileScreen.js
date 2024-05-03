@@ -13,7 +13,6 @@ import { Button, Snackbar } from "react-native-paper";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import ProfileInfoCard from "../Components/ProfileInfoCard";
 import { theme } from "../Styles/styles";
-import { useNavigation } from "@react-navigation/native";
 
 //API
 import axios from "axios";
@@ -21,36 +20,13 @@ import * as SecureStore from "expo-secure-store";
 import { IP_ADDRESS } from "../Functions/GetIP";
 import ProfilePicturePicker from "../Components/ProfilePicturePicker";
 
-const ProfileScreen = () => {
-  // Mock business information
-  // const businessInfo = {
-  //   name: "Your Business Name",
-  //   email: "business@example.com",
-  //   password: "********", // Masked password
-  //   phoneNumber: "+1234567890",
-  //   address: "123 Business Street, City, Country",
-  //   // You can replace the image source with the actual path or URL of the profile picture
-  //   profilePicture: require("../assets/businesslogos/logo_bakery.png"),
-  //   openingTime: "08.00",
-  //   closingTime: "17.00",
-  // };
+const ProfileScreen = ({navigation}) => {
   const [businessInfo, setBusinessInfo] = useState([]);
-  //   businessName: "Your Business Name",
-  //   email: "business@example.com",
-  //   password: "********", // Masked password
-  //   phoneNumber: "+1234567890",
-  //   address: "123 Business Street, City, Country",
-  //   // You can replace the image source with the actual path or URL of the profile picture
-  //   profilePicture: require("../assets/businesslogos/logo_bakery.png"),
-  //   openingTime: "08.00",
-  //   closingTime: "17.00",
-  // });
 
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [chosenProfilePic, setChosenProfilePic] = useState("");
-  const navigation = useNavigation();
 
   const putBusinessName = (value) => {
     if (!value) {
@@ -227,6 +203,9 @@ const ProfileScreen = () => {
         setBusinessInfo(response.data);
       }
 
+      await SecureStore.setItemAsync("openingHour", response.data.openingHour);
+      await SecureStore.setItemAsync("closingHour", response.data.closingHour);
+
       setIsRefreshing(false);
 
       // Add an arbitrary "isOpen" attribute to each business
@@ -243,6 +222,17 @@ const ProfileScreen = () => {
       setIsRefreshing(false);
     }
   };
+
+  const handleLogOut = async () => {
+
+    //delete cache
+    await SecureStore.deleteItemAsync("userToken");
+    await SecureStore.deleteItemAsync("userID");
+    await SecureStore.deleteItemAsync("openingHour");
+    await SecureStore.deleteItemAsync("closingHour");
+
+    navigation.navigate("Login");
+  }
 
   useEffect(() => {
     fetchProfile();
@@ -329,6 +319,7 @@ const ProfileScreen = () => {
             icon={() => <Ionicons name="log-out" size={24} color="white" />}
             onPress={() => {
               // Handle logout logic
+              handleLogOut();
               console.log("Logged out");
             }}
             mode="contained"
@@ -340,7 +331,8 @@ const ProfileScreen = () => {
             buttonColor="teal"
             icon={() => <Ionicons name="map" size={24} color="white" />}
             onPress={() => {
-              navigation.navigate("MapLocationPickerScreen");
+              // Handle map location upload logic
+              console.log("Upload Map Location");
             }}
           >
             Edit Map Location

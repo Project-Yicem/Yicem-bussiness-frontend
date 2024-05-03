@@ -41,20 +41,21 @@ export default function OffersScreen({ navigation }) {
   const [newTotalItems, setNewTotalItems] = useState(0);
   const [selectedPickupTimes, setSelectedPickupTimes] = useState([]);
 
-  const initNewItem = () => {
+  const[openingTime, setOpeningTime] = useState("10:45");
+  const[closingTime, setClosingTime] = useState("16:45");
+
+  const InitNewItem = () => {
     setNewTitle("");
     setNewDescription("");
     setNewPrice(0);
     setNewTotalItems(0);
-    selectedPickupTimes([]);
+    setSelectedPickupTimes([]);
   };
 
   const [isModalVisible, setModalVisible] = useState(false);
   const showModal = () => setModalVisible(true);
   const hideModal = () => setModalVisible(false);
 
-  const openingTime = "10:45"; // Example opening time (in 24-hour format)
-  const closingTime = "16:40"; // Example closing time (in 24-hour format)
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -62,6 +63,14 @@ export default function OffersScreen({ navigation }) {
       setRefreshing(false);
     }, 2000);
   }, []);
+
+  //get open close time
+  const updateTimes = async () => {
+    setOpeningTime( await SecureStore.getItemAsync("openingHour"));
+    setClosingTime( await SecureStore.getItemAsync("closingHour"));
+
+    console.log(closingHour,openingHour);
+  }
 
   //Fetch offers
   const fetchOffers = async () => {
@@ -80,7 +89,7 @@ export default function OffersScreen({ navigation }) {
       const response = await axios.get(apiUrl, config);
       console.log(response);
 
-      if (response.data === "Offer list is empty") {
+      if (response.data.length === 0) {
         setOffers([]);
       } else {
         setOffers(response.data);
@@ -100,24 +109,28 @@ export default function OffersScreen({ navigation }) {
       setErrorMessage("Error fetching offers!");
       setIsOffersLoading(false);
     }
+    InitNewItem();
   };
 
   //add offers
   const addOffer = async () => {
+    const positiveIntegerRegex = /^[1-9]\d*$/;
+    const priceRegex = /^\d+(\.\d{1,2})?$/;
+
     if (!newTitle || !newDescription || !newPrice || !newTotalItems) {
       setErrorMessage("please fill all the fields!");
       setShowError(true);
       return;
     }
 
-    if (newPrice == 0) {
+    if (!priceRegex.test(newPrice)) {
       setErrorMessage("please enter a valid price!");
       setShowError(true);
       return;
     }
 
-    if (newTotalItems == 0) {
-      setErrorMessage("Please include at least one item!");
+    if (!positiveIntegerRegex.test(newTotalItems)) {
+      setErrorMessage("Please enter a valid item count!");
       setShowError(true);
       return;
     }
@@ -175,8 +188,11 @@ export default function OffersScreen({ navigation }) {
     }
   };
 
-  useEffect(() => {
+  useEffect( () => {
     fetchOffers();
+
+    //get open-close time
+    updateTimes();
   }, []);
 
   useEffect(() => {
@@ -184,11 +200,17 @@ export default function OffersScreen({ navigation }) {
       setFilteredData(offers);
       return;
     }
-    setFilteredData(
-      offers.filter((offer) =>
-        offer.offerName.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    );
+    if(offers.length > 0){
+      setFilteredData(
+        offers.filter((offer) =>
+          offer.offerName.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    }
+    else{
+      setFilteredData(offers);
+      return;
+    }
   }, [offers, searchQuery]);
 
   const generatePickupTimes = (openingTime, closingTime) => {
@@ -226,12 +248,12 @@ export default function OffersScreen({ navigation }) {
   };
 
   const renderOffers = () => {
-    console.log(offers);
-    console.log("Filtered data", filteredData);
+    //console.log(offers);
     if (!filteredData || filteredData.length === 0) {
-      return <Text>No Offers</Text>;
+      return  <View style={styles.EmptyInfoContainer}>
+                <Text style={styles.EmptyInfoText}>No offers</Text>
+              </View>;
     }
-
     try {
       return filteredData.map((item) => (
         <OfferItem
@@ -250,8 +272,9 @@ export default function OffersScreen({ navigation }) {
         />
       ));
     } catch (error) {
-      return;
-    }
+      return  <View style={styles.EmptyInfoContainer}>
+                <Text style={styles.EmptyInfoText}>No offers</Text>
+              </View>;    }
   };
 
   return (
@@ -260,7 +283,7 @@ export default function OffersScreen({ navigation }) {
         refreshControl={
           <RefreshControl
             refreshing={isOffersLoading}
-            onRefresh={fetchOffers}
+            onRefresh={() => { fetchOffers(); updateTimes();}}
           />
         }
       >
@@ -408,6 +431,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderWidth: 1,
     borderColor: theme.colors.primary, // Change the color as needed
+  },
+  EmptyInfoContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    //backgroundColor: '#f2f2f2', // Passive gray color
+  },
+  EmptyInfoText: {
+    color: '#888', // Gray color for the text
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 
