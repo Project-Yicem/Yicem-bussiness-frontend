@@ -19,16 +19,7 @@ const TimePicker = () => {
   return (
     <View>
       <Button onPress={showTimepicker} title="Select Time" />
-      {showPicker && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={time}
-          mode="time"
-          is24Hour={true}
-          display="default"
-          onChange={onChange}
-        />
-      )}
+     
     </View>
   );
 };
