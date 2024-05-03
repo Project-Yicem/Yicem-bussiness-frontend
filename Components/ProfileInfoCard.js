@@ -42,7 +42,14 @@ const ProfileInfoCard = ({
         <Text style={styles.title}>{title}</Text>
         {isProfilePicture ? (
           <View style={styles.profilePictureContainer}>
-            <Image source={{ uri: info }} style={styles.profilePicture} />
+            {info ? (
+              <Image source={{ uri: info }} style={styles.profilePicture} />
+            ) : (
+              <Image
+                source={require("../assets/splash.png")}
+                style={styles.profilePicture}
+              />
+            )}
           </View>
         ) : isTimeRange ? (
           <View style={styles.editableText}>

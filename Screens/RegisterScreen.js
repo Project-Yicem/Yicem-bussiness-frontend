@@ -47,11 +47,10 @@ export default function RegisterScreen({ navigation }) {
     const minutes = selectedDate.getMinutes().toString().padStart(2, "0");
     const formattedTime = `${hours}:${minutes}`;
     setTime(formattedTime);
-    hideDatePicker();
+    hideTimePicker();
   };
   const register = async () => {
     const apiUrl = `http://${IP_ADDRESS}:8080/api/auth/signup/seller`;
-
     try {
       setIsLoading(true);
       //console.log("Registering with username: ", username);

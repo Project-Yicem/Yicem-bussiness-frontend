@@ -13,6 +13,7 @@ import { Button, Snackbar } from "react-native-paper";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import ProfileInfoCard from "../Components/ProfileInfoCard";
 import { theme } from "../Styles/styles";
+import { useNavigation } from "@react-navigation/native";
 
 //API
 import axios from "axios";
@@ -49,6 +50,7 @@ const ProfileScreen = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [chosenProfilePic, setChosenProfilePic] = useState("");
+  const navigation = useNavigation();
 
   const putBusinessName = (value) => {
     if (!value) {
@@ -338,8 +340,7 @@ const ProfileScreen = () => {
             buttonColor="teal"
             icon={() => <Ionicons name="map" size={24} color="white" />}
             onPress={() => {
-              // Handle map location upload logic
-              console.log("Upload Map Location");
+              navigation.navigate("MapLocationPickerScreen");
             }}
           >
             Edit Map Location

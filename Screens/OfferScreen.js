@@ -80,7 +80,7 @@ export default function OffersScreen({ navigation }) {
       const response = await axios.get(apiUrl, config);
       console.log(response);
 
-      if (response.data === "Offer list is empty.") {
+      if (response.data === "Offer list is empty") {
         setOffers([]);
       } else {
         setOffers(response.data);
@@ -226,7 +226,8 @@ export default function OffersScreen({ navigation }) {
   };
 
   const renderOffers = () => {
-    //console.log(offers);
+    console.log(offers);
+    console.log("Filtered data", filteredData);
     if (!filteredData || filteredData.length === 0) {
       return <Text>No Offers</Text>;
     }
