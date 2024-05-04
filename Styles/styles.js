@@ -23,6 +23,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     width: "80%",
   },
+  timeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "80%",
+    marginBottom: 20,
+  },
+  timeInput: {
+    flex: 1,
+    marginBottom: 16,
+  },
   button: {
     marginBottom: 16,
     width: "80%",
@@ -62,11 +72,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#000000", // Change the color as needed
   },
-  timeContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
+  // timeContainer: {
+  //   flexDirection: "row",
+  //   //justifyContent: "space-between",
+  //   alignItems: "center",
+  //   width:"%80",
+  //   marginBottom: 20,
+  // },
+  separator: {
+    fontSize: 20,
+    marginHorizontal: 5,
   },
 });
 

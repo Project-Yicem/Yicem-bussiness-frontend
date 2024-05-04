@@ -5,8 +5,9 @@ import {
   StyleSheet,
   ScrollView,
   RefreshControl,
+  View,
 } from "react-native";
-import { Button, Title, Card, Snackbar, Searchbar } from "react-native-paper";
+import { Button, Title, Card, Snackbar, Searchbar, Text } from "react-native-paper";
 import SaleItem from "../Components/SaleItem";
 import { theme } from "../Styles/styles";
 
@@ -72,7 +73,7 @@ const HistoryScreen = () => {
       const response = await axios.get(apiUrl, config);
       console.log(response.data);
 
-      if (response.data === "History is empty.") {
+      if (response.data.length === 0) {
         setSales([]);
       } else {
         setSales(response.data);
@@ -111,31 +112,43 @@ const HistoryScreen = () => {
       setFilteredData(sales);
       return;
     }
-    setFilteredData(
-      sales.filter((item) =>
-        item.offerName.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    );
+    if(sales.length > 0){
+      setFilteredData(
+        sales.filter((item) =>
+          item.offerName.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    }
+    else{
+      setFilteredData(sales);
+      return;
+    }
   }, [sales, searchQuery]);
 
   const showSales = () => {
     console.log(sales);
-    if (filteredData && filteredData.length >= 0) {
-      try {
-        return filteredData.map((item) => (
-          <SaleItem
-            key={item.id}
-            title={item.offerName /*item.title*/}
-            price={item.price}
-            dateTime={item.transactionDate}
-            rating={(item.review && item.review.rating) || -1}
-            customerName={item.buyerName}
-            comment={item.review && item.review.comment}
-          />
-        ));
-      } catch (error) {
-        console.log(error);
-      }
+    if (!filteredData || filteredData.length === 0) {
+      return  <View style={styles.EmptyInfoContainer}>
+                <Text style={styles.EmptyInfoText}>No Past Sale</Text>
+              </View>;
+    }
+    try {
+      return filteredData.map((item) => (
+        <SaleItem
+          key={item.id}
+          title={item.offerName /*item.title*/}
+          price={item.price}
+          dateTime={item.transactionDate}
+          rating={(item.review && item.review.rating) || -1}
+          customerName={item.buyerName}
+          comment={item.review && item.review.comment}
+        />
+      ));
+    } catch (error) {
+      console.log(error);
+      return  <View style={styles.EmptyInfoContainer}>
+                <Text style={styles.EmptyInfoText}>No Past Sale</Text>
+              </View>;
     }
   };
 
@@ -186,6 +199,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderWidth: 1,
     borderColor: theme.colors.primary, // Change the color as needed
+  },
+  EmptyInfoContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    //backgroundColor: '#f2f2f2', // Passive gray color
+  },
+  EmptyInfoText: {
+    color: '#888', // Gray color for the text
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 
