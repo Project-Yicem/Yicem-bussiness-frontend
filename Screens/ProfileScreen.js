@@ -20,7 +20,7 @@ import * as SecureStore from "expo-secure-store";
 import { IP_ADDRESS } from "../Functions/GetIP";
 import ProfilePicturePicker from "../Components/ProfilePicturePicker";
 
-const ProfileScreen = ({navigation}) => {
+const ProfileScreen = ({ navigation }) => {
   const [businessInfo, setBusinessInfo] = useState([]);
 
   const [showError, setShowError] = useState(false);
@@ -142,7 +142,8 @@ const ProfileScreen = ({navigation}) => {
           fetchProfile();
         });
     } catch (error) {
-      console.error("Error updating password:", error);
+      //console.error("Error updating password:", error);
+      alert("Please make sure your old password is correct.");
       setIsRefreshing(false);
     }
     return 1;
@@ -224,7 +225,6 @@ const ProfileScreen = ({navigation}) => {
   };
 
   const handleLogOut = async () => {
-
     //delete cache
     await SecureStore.deleteItemAsync("userToken");
     await SecureStore.deleteItemAsync("userID");
@@ -232,7 +232,7 @@ const ProfileScreen = ({navigation}) => {
     await SecureStore.deleteItemAsync("closingHour");
 
     navigation.navigate("Login");
-  }
+  };
 
   useEffect(() => {
     fetchProfile();
