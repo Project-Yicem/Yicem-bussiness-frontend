@@ -96,7 +96,7 @@ const HistoryScreen = () => {
       );
       setIsLoading(false);
     } catch (error) {
-      console.error("Error fetching history:", error);
+      console.error("Error fetching history");
       setShowError(true);
       setErrorMessage("Error fetching History!");
       setIsLoading(false);

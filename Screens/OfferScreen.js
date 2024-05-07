@@ -104,7 +104,7 @@ export default function OffersScreen({ navigation }) {
       // });
       // setBusinesses(updatedBusinesses);
     } catch (error) {
-      console.error("Error fetching offers data:", error);
+      console.error("Error fetching offers data");
       setShowError(true);
       setErrorMessage("Error fetching offers!");
       setIsOffersLoading(false);
@@ -183,7 +183,7 @@ export default function OffersScreen({ navigation }) {
           fetchOffers();
         });
     } catch (error) {
-      console.error("Error adding offers:", error);
+      console.error("Error adding offers");
       setIsOffersLoading(false);
     }
   };

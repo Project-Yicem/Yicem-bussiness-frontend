@@ -35,6 +35,11 @@ export default function RegisterScreen({ navigation }) {
   const [focusedInput, setFocusedInput] = useState("");
 
   const onDateTimeChange = (event, selectedDate) => {
+    if (event.type === "dismissed") {
+      // User dismissed the picker, handle cancel action here
+      setShowTimePicker(false);
+      return;
+    }
 
     const currentTime = selectedDate || new Date();
     setShowTimePicker(false);
@@ -89,7 +94,7 @@ export default function RegisterScreen({ navigation }) {
           closingHour: endTime,
           //locationCoordinates: "0",
           //reservationTimeOut: 0,
-          approved: true,
+          //approved: true,
         })
         .then((response) => {
           console.log("Registration successful");
@@ -98,7 +103,7 @@ export default function RegisterScreen({ navigation }) {
           navigation.navigate("Waiting");
         });
     } catch (error) {
-      console.error("Error registering user:", error);
+      console.error("Error registering user");
       setErrorText("Error registering user!");
       setShowFail(true);
       setIsLoading(false);
@@ -110,6 +115,7 @@ export default function RegisterScreen({ navigation }) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\d{10}$/;
     const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
     // Check if all fields are filled
     if (
@@ -131,6 +137,14 @@ export default function RegisterScreen({ navigation }) {
     // Check if the password matches the confirm password
     if (password !== confirmPassword) {
       setErrorText("Passwords don't match!");
+      setShowFail(true);
+      setPassword("");
+      setConfirmPassword("");
+      return;
+    }
+
+    if (!passwordRegex.test(password) || !passwordRegex.test(confirmPassword)) {
+      setErrorText("Password should have at least 8 characters long, must contain at least one letter and one numeral!");
       setShowFail(true);
       setPassword("");
       setConfirmPassword("");
@@ -201,14 +215,19 @@ export default function RegisterScreen({ navigation }) {
           mode="outlined"
           style={styles.input}
         />
-        <TextInput
-          label="Enter Phone Number"
-          value={phoneNumber}
-          onChangeText={(text) => setPhoneNumber(text)}
-          mode="outlined"
-          keyboardType="phone-pad" // Opens a numerical keyboard
-          style={styles.input}
-        />
+        <View style={styles.phoneContainer}>
+          <Text style={styles.centeredText}>
+             +90
+          </Text>
+          <TextInput 
+            label="Enter Phone Number"
+            value={phoneNumber}
+            onChangeText={(text) => setPhoneNumber(text)}
+            mode="outlined"
+            keyboardType="phone-pad" // Opens a numerical keyboard
+            style={styles.timeInput}
+          />
+        </View>
         <TextInput
           label="Enter Address"
           value={address}
@@ -218,14 +237,17 @@ export default function RegisterScreen({ navigation }) {
         />
         <View style={styles.timeContainer}>
           <TextInput
-            label="Start Time"
+            label="Opening Time"
             value={startTime}
             onFocus={() => onDateTimeFocus("startTime")}
             mode="outlined"
             style={styles.timeInput}
           />
+          <Text style={styles.separator}>
+             - 
+          </Text>
           <TextInput
-            label="End Time"
+            label="Closing Time"
             value={endTime}
             onFocus={() => onDateTimeFocus("endTime")}
             mode="outlined"

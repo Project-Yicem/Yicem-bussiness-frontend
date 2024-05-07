@@ -142,8 +142,10 @@ const ProfileScreen = ({navigation}) => {
           fetchProfile();
         });
     } catch (error) {
-      console.error("Error updating password:", error);
+      setErrorMessage("Please enter valid passwords!");
+      setShowError(true);
       setIsRefreshing(false);
+      return 0;
     }
     return 1;
   };
@@ -173,7 +175,7 @@ const ProfileScreen = ({navigation}) => {
           fetchProfile();
         });
     } catch (error) {
-      console.error("Error updating profile:", error);
+      console.error("Error updating profile");
       setIsRefreshing(false);
     }
   };
@@ -216,7 +218,7 @@ const ProfileScreen = ({navigation}) => {
       // });
       // setBusinesses(updatedBusinesses);
     } catch (error) {
-      console.error("Error fetching offers data:", error);
+      console.error("Error fetching offers data");
       setShowError(true);
       setErrorMessage("Error fetching offers!");
       setIsRefreshing(false);
@@ -331,8 +333,7 @@ const ProfileScreen = ({navigation}) => {
             buttonColor="teal"
             icon={() => <Ionicons name="map" size={24} color="white" />}
             onPress={() => {
-              // Handle map location upload logic
-              console.log("Upload Map Location");
+              navigation.navigate("MapLocationPickerScreen");
             }}
           >
             Edit Map Location

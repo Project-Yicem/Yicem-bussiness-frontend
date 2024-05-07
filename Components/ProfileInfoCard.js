@@ -19,6 +19,11 @@ const ProfileInfoCard = ({
   const [focusedInput, setFocusedInput] = useState("");
 
   const onDateTimeChange = (event, selectedDate) => {
+    if (event.type === "dismissed") {
+      // User dismissed the picker, handle cancel action here
+      setShowTimePicker(false);
+      return;
+    }
 
     const currentTime = selectedDate || new Date();
     setShowTimePicker(false);
@@ -30,7 +35,7 @@ const ProfileInfoCard = ({
     // Check if startTime or endTime input is focused and update accordingly
     if (focusedInput === "startTime") {
       setEditedInfo({...editedInfo, openingTime: formattedTime});//setStartTime(formattedTime);
-    } else if (focusedInput === "endTime") {
+    } else if (focusedInput === "closeTime") {
       setEditedInfo({...editedInfo, closingTime: formattedTime});
     }
   };
@@ -69,7 +74,14 @@ const ProfileInfoCard = ({
         <Text style={styles.title}>{title}</Text>
         {isProfilePicture ? (
           <View style={styles.profilePictureContainer}>
-            <Image source={{ uri: info }} style={styles.profilePicture} />
+            {info ? (
+              <Image source={{ uri: info }} style={styles.profilePicture} />
+            ) : (
+              <Image
+                source={require("../assets/splash.png")}
+                style={styles.profilePicture}
+              />
+            )}
           </View>
         ) : isTimeRange ? (
           <View style={styles.editableText}>

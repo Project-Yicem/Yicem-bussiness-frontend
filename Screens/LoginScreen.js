@@ -78,9 +78,9 @@ export default function LoginScreen({ navigation }) {
       await SecureStore.setItemAsync("closingHour", response.data.closingHour);
       
     } catch (error) {
-      console.error("Error getting profile info", error);
+      console.error("Error getting profile info");
       setShowError(true);
-      setErrorMessage("Error getting profile info", error);
+      setErrorMessage("Error getting profile info!");
       setIsRefreshing(false);
     }
   }

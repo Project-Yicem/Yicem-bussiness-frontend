@@ -15,6 +15,7 @@ import MainTabs from './MainTabs';
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 import { IP_ADDRESS } from "./Functions/GetIP";
+import MapLocationPickerScreen from "./Screens/MapLocationPickerScreen";
 
 import styles, { theme } from './Styles/styles';
 
@@ -43,7 +44,7 @@ function AppContent(){
     const userToken = await SecureStore.getItemAsync("userToken");          //PRONE TO FAIL
     if (userToken) {
       console.log(userToken);
-      navigation.navigate("Login");
+      navigation.navigate("MainHome");
     } else {
       navigation.navigate("Login");
     }
@@ -64,6 +65,10 @@ function AppContent(){
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Waiting" component={WaitingScreen} />
       <Stack.Screen name="MainHome" component={MainTabs} />
+      <Stack.Screen
+        name="MapLocationPickerScreen"
+        component={MapLocationPickerScreen}
+      />
     </Stack.Navigator>
   );
 }

@@ -42,7 +42,7 @@ const SaleItem = ({
               maxStars={5}
               rating={rating}
               starSize={14}
-              fullStarColor="green"
+              fullStarColor="#fcba03"
               emptyStarColor="grey"
             />
           )}
