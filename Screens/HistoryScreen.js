@@ -26,35 +26,6 @@ const HistoryScreen = () => {
   const [filteredData, setFilteredData] = useState([]);
 
   const [sales, setSales] = useState([]);
-  //   {
-  //     id: '1',
-  //     title: 'Pastry Box',
-  //     price: '$19.99',
-  //     dateTime: '2023-12-01 08:30 AM',
-  //     rating: 4,
-  //     customerName: "John Doe",
-  //     comment:null,
-  //   },
-  //   {
-  //     id: '2',
-  //     title: 'Product 2',
-  //     price: '$29.99',
-  //     dateTime: '2023-12-02 10:45 AM',
-  //     rating: 2,
-  //     customerName: "John Dove",
-  //     comment:null,
-  //   },
-  //   {
-  //     id: '2',
-  //     title: 'Product 2',
-  //     price: '$29.99',
-  //     dateTime: '2023-12-02 10:45 AM',
-  //     rating: 5,
-  //     customerName: "Joe Boe",
-  //     comment:"It was just as fresh! would recommend."
-  //   },
-  //   // Add more sale items as needed
-  // ]);
 
   //Fetch offers
   const fetchSales = async () => {
@@ -96,7 +67,7 @@ const HistoryScreen = () => {
       );
       setIsLoading(false);
     } catch (error) {
-      console.error("Error fetching history:", error);
+      console.error("Error fetching history");
       setShowError(true);
       setErrorMessage("Error fetching History!");
       setIsLoading(false);
@@ -198,7 +169,7 @@ const styles = StyleSheet.create({
     //marginTop: 40,
     backgroundColor: "#ffffff",
     borderWidth: 1,
-    borderColor: theme.colors.primary, // Change the color as needed
+    borderColor: theme.colors.primary, 
   },
   EmptyInfoContainer: {
     flex: 1,
@@ -207,7 +178,7 @@ const styles = StyleSheet.create({
     //backgroundColor: '#f2f2f2', // Passive gray color
   },
   EmptyInfoText: {
-    color: '#888', // Gray color for the text
+    color: '#888',
     fontSize: 16,
     textAlign: 'center',
   },

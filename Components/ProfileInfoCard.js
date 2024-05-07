@@ -34,7 +34,7 @@ const ProfileInfoCard = ({
     const formattedTime = `${hours}:${minutes}`;
     // Check if startTime or endTime input is focused and update accordingly
     if (focusedInput === "startTime") {
-      setEditedInfo({...editedInfo, openingTime: formattedTime});//setStartTime(formattedTime);
+      setEditedInfo({...editedInfo, openingTime: formattedTime});
     } else if (focusedInput === "closeTime") {
       setEditedInfo({...editedInfo, closingTime: formattedTime});
     }
@@ -42,7 +42,7 @@ const ProfileInfoCard = ({
 
   const onDateTimeFocus = (input) => {
     setShowTimePicker(true);
-    setFocusedInput(input); // Set which input is currently focused
+    setFocusedInput(input);
   };
 
   useEffect(() => {

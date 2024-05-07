@@ -41,8 +41,8 @@ export default function OffersScreen({ navigation }) {
   const [newTotalItems, setNewTotalItems] = useState(0);
   const [selectedPickupTimes, setSelectedPickupTimes] = useState([]);
 
-  const [openingTime, setOpeningTime] = useState("10:45");
-  const [closingTime, setClosingTime] = useState("16:45");
+  const[openingTime, setOpeningTime] = useState("10:45");
+  const[closingTime, setClosingTime] = useState("16:45");
 
   const InitNewItem = () => {
     setNewTitle("");
@@ -56,6 +56,7 @@ export default function OffersScreen({ navigation }) {
   const showModal = () => setModalVisible(true);
   const hideModal = () => setModalVisible(false);
 
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
@@ -65,11 +66,11 @@ export default function OffersScreen({ navigation }) {
 
   //get open close time
   const updateTimes = async () => {
-    setOpeningTime(await SecureStore.getItemAsync("openingHour"));
-    setClosingTime(await SecureStore.getItemAsync("closingHour"));
+    setOpeningTime( await SecureStore.getItemAsync("openingHour"));
+    setClosingTime( await SecureStore.getItemAsync("closingHour"));
 
-    //console.log(closingHour,openingHour);
-  };
+    console.log(closingHour,openingHour);
+  }
 
   //Fetch offers
   const fetchOffers = async () => {
@@ -94,16 +95,8 @@ export default function OffersScreen({ navigation }) {
         setOffers(response.data);
       }
       setIsOffersLoading(false);
-
-      // Add an arbitrary "isOpen" attribute to each business
-      // TODO This is temporary!!! This should be handled by the backend
-      // const updatedBusinesses = response.data.map((business) => {
-      //   business.isOpen = true;
-      //   return business;
-      // });
-      // setBusinesses(updatedBusinesses);
     } catch (error) {
-      console.error("Error fetching offers data:", error);
+      console.error("Error fetching offers data");
       setShowError(true);
       setErrorMessage("Error fetching offers!");
       setIsOffersLoading(false);
@@ -178,16 +171,16 @@ export default function OffersScreen({ navigation }) {
           console.log("offer adding successful");
           console.log(response);
           setIsOffersLoading(false);
-          hideModal(); //setSuccessVisible(true);
+          hideModal();
           fetchOffers();
         });
     } catch (error) {
-      console.error("Error adding offers:", error);
+      console.error("Error adding offers");
       setIsOffersLoading(false);
     }
   };
 
-  useEffect(() => {
+  useEffect( () => {
     fetchOffers();
 
     //get open-close time
@@ -199,13 +192,14 @@ export default function OffersScreen({ navigation }) {
       setFilteredData(offers);
       return;
     }
-    if (offers.length > 0) {
+    if(offers.length > 0){
       setFilteredData(
         offers.filter((offer) =>
           offer.offerName.toLowerCase().includes(searchQuery.toLowerCase())
         )
       );
-    } else {
+    }
+    else{
       setFilteredData(offers);
       return;
     }
@@ -248,11 +242,9 @@ export default function OffersScreen({ navigation }) {
   const renderOffers = () => {
     //console.log(offers);
     if (!filteredData || filteredData.length === 0) {
-      return (
-        <View style={styles.EmptyInfoContainer}>
-          <Text style={styles.EmptyInfoText}>No offers</Text>
-        </View>
-      );
+      return  <View style={styles.EmptyInfoContainer}>
+                <Text style={styles.EmptyInfoText}>No offers</Text>
+              </View>;
     }
     try {
       return filteredData.map((item) => (
@@ -272,12 +264,9 @@ export default function OffersScreen({ navigation }) {
         />
       ));
     } catch (error) {
-      return (
-        <View style={styles.EmptyInfoContainer}>
-          <Text style={styles.EmptyInfoText}>No offers</Text>
-        </View>
-      );
-    }
+      return  <View style={styles.EmptyInfoContainer}>
+                <Text style={styles.EmptyInfoText}>No offers</Text>
+              </View>;    }
   };
 
   return (
@@ -286,19 +275,10 @@ export default function OffersScreen({ navigation }) {
         refreshControl={
           <RefreshControl
             refreshing={isOffersLoading}
-            onRefresh={() => {
-              fetchOffers();
-              updateTimes();
-            }}
+            onRefresh={() => { fetchOffers(); updateTimes();}}
           />
         }
       >
-        {/* {isOffersLoading &&
-          <ActivityIndicator
-          animating={true}
-          color={theme.colors.primary}
-          style={{ marginTop: "20%" }}
-        /> */}
         <Searchbar
           placeholder="Search Offer..."
           onChangeText={(query) => setSearchQuery(query)}
@@ -344,7 +324,7 @@ export default function OffersScreen({ navigation }) {
               value={newPrice}
               onChangeText={(text) => setNewPrice(text)}
               mode="outlined"
-              keyboardType="numeric" // Opens a numerical keyboard
+              keyboardType="numeric"
               style={styles.input}
             />
             <TextInput
@@ -352,7 +332,7 @@ export default function OffersScreen({ navigation }) {
               value={newTotalItems}
               onChangeText={(text) => setNewTotalItems(text)}
               mode="outlined"
-              keyboardType="numeric" // Opens a numerical keyboard
+              keyboardType="numeric"
               style={styles.input}
             />
             <Text style={styles.modalTitle}>Select Pickup Times</Text>
@@ -375,7 +355,7 @@ export default function OffersScreen({ navigation }) {
             ))}
           </ScrollView>
           <Button
-            onPress={addOffer /*handleSaveChanges*/}
+            onPress={addOffer}
             mode="contained"
             style={styles.button}
           >
@@ -392,15 +372,6 @@ export default function OffersScreen({ navigation }) {
           {errorMessage}
         </Snackbar>
       </Portal>
-      {/* error occured, show a snackbar
-      <Snackbar
-        visible={showError}
-        onDismiss={() => setShowError(false)}
-        onIconPress={() => setShowError(false)}
-        duration={Snackbar.LENGTH_SHORT}
-      >
-        {errorMessage}
-      </Snackbar> */}
     </SafeAreaView>
   );
 }
@@ -415,7 +386,7 @@ const styles = StyleSheet.create({
     padding: 20,
     margin: 16,
     borderRadius: 8,
-    maxHeight: "80%", // Set maximum height for the modal
+    maxHeight: "80%",
   },
   scrollContainer: {
     flexGrow: 1,
@@ -436,18 +407,18 @@ const styles = StyleSheet.create({
     //marginTop: 40,
     backgroundColor: "#ffffff",
     borderWidth: 1,
-    borderColor: theme.colors.primary, // Change the color as needed
+    borderColor: theme.colors.primary, 
   },
   EmptyInfoContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     //backgroundColor: '#f2f2f2', // Passive gray color
   },
   EmptyInfoText: {
-    color: "#888", // Gray color for the text
+    color: '#888',
     fontSize: 16,
-    textAlign: "center",
+    textAlign: 'center',
   },
 });
 

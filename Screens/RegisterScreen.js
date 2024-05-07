@@ -65,21 +65,11 @@ export default function RegisterScreen({ navigation }) {
   const [errorText, setErrorText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // const handleTimeConfirm = (selectedDate) => {
-  //   const hours = selectedDate.getHours().toString().padStart(2, "0");
-  //   const minutes = selectedDate.getMinutes().toString().padStart(2, "0");
-  //   const formattedTime = `${hours}:${minutes}`;
-  //   setTime(formattedTime);
-  //   hideDatePicker();
-  // };
-
   const register = async () => {
     const apiUrl = `http://${IP_ADDRESS}:8080/api/auth/signup/seller`;
 
     try {
       setIsLoading(true);
-      //console.log("Registering with username: ", username);
-      //console.log("Sending request to ", apiUrl);
 
       const response = await axios
         .post(apiUrl, {
@@ -89,21 +79,16 @@ export default function RegisterScreen({ navigation }) {
           address: address,
           phone: phoneNumber,
           businessName: businessName,
-          //workingHours: workingHours,
           openingHour: startTime,
           closingHour: endTime,
-          //locationCoordinates: "0",
-          //reservationTimeOut: 0,
-          approved: true,
         })
         .then((response) => {
           console.log("Registration successful");
           setIsLoading(false);
-          //setSuccessVisible(true);
           navigation.navigate("Waiting");
         });
     } catch (error) {
-      console.error("Error registering user:", error);
+      console.error("Error registering user");
       setErrorText("Error registering user!");
       setShowFail(true);
       setIsLoading(false);
@@ -115,6 +100,7 @@ export default function RegisterScreen({ navigation }) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\d{10}$/;
     const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
     // Check if all fields are filled
     if (
@@ -136,6 +122,14 @@ export default function RegisterScreen({ navigation }) {
     // Check if the password matches the confirm password
     if (password !== confirmPassword) {
       setErrorText("Passwords don't match!");
+      setShowFail(true);
+      setPassword("");
+      setConfirmPassword("");
+      return;
+    }
+
+    if (!passwordRegex.test(password) || !passwordRegex.test(confirmPassword)) {
+      setErrorText("Password should have at least 8 characters long, must contain at least one letter and one numeral!");
       setShowFail(true);
       setPassword("");
       setConfirmPassword("");
@@ -206,14 +200,19 @@ export default function RegisterScreen({ navigation }) {
           mode="outlined"
           style={styles.input}
         />
-        <TextInput
-          label="Enter Phone Number"
-          value={phoneNumber}
-          onChangeText={(text) => setPhoneNumber(text)}
-          mode="outlined"
-          keyboardType="phone-pad" // Opens a numerical keyboard
-          style={styles.input}
-        />
+        <View style={styles.phoneContainer}>
+          <Text style={styles.centeredText}>
+             +90
+          </Text>
+          <TextInput 
+            label="Enter Phone Number"
+            value={phoneNumber}
+            onChangeText={(text) => setPhoneNumber(text)}
+            mode="outlined"
+            keyboardType="phone-pad"
+            style={styles.timeInput}
+          />
+        </View>
         <TextInput
           label="Enter Address"
           value={address}
@@ -254,7 +253,7 @@ export default function RegisterScreen({ navigation }) {
           mode="contained"
           disabled={isLoading}
           onPress={() => {
-            handleRegister(); /*navigation.navigate('Waiting');*/
+            handleRegister();
           }}
         >
           Send Application Request
@@ -287,61 +286,3 @@ export default function RegisterScreen({ navigation }) {
     </ScrollView>
   );
 }
-
-//     <View style={styles.profileContainer}>
-//           <RegisterInfoCard
-//             title="Username"
-//             info={username}
-//             isEditable={true}
-//             onEditSave={handleEditSave}
-//           />
-//           <RegisterInfoCard
-//             title="Business Name"
-//             info={businessName}
-//             isEditable={true}
-//             onEditSave={handleEditSave}
-//           />
-//           <RegisterInfoCard
-//             title="Email"
-//             info={email}
-//             isEditable={true}
-//             onEditSave={handleEditSave}
-//           />
-//           <RegisterInfoCard
-//             title="Password"
-//             info={password}
-//             isEditable={true}
-//             onEditSave={handleEditSave}
-//           />
-//           <RegisterInfoCard
-//             title="Phone Number"
-//             info={phoneNumber}
-//             isEditable={true}
-//             onEditSave={handleEditSave}
-//           />
-//           <RegisterInfoCard
-//             title="Address"
-//             info={address}
-//             isEditable={true}
-//             onEditSave={handleEditSave}
-//           />
-//           <RegisterInfoCard
-//             title="Open Hours"
-//             info={{
-//               openingTime: businessInfo.openingTime,
-//               closingTime: businessInfo.closingTime,
-//             }}
-//             isEditable={true}
-//             onEditSave={handleEditSave}
-//             isTimeRange={true}
-//           />
-//           <RegisterInfoCard
-//             title="Profile Picture"
-//             isProfilePicture={true}
-//             info={businessInfo.profilePicture}
-//             isEditable={true}
-//             onEditSave={handleEditSave}
-//           />
-//         </View>
-//   )
-// };

@@ -21,9 +21,6 @@ export default function WaitingScreen({ navigation }) {
         
         Thank you for your patience.
       </Text>
-      {/* <Button mode="contained" onPress={() => navigation.navigate('Register')} style={styles.hollowButton}>
-        Change Info
-      </Button> */}
       <Button mode="outline" onPress={() => navigation.navigate('Login')} > 
         Log In
       </Button>

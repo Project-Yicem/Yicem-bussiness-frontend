@@ -20,7 +20,7 @@ import * as SecureStore from "expo-secure-store";
 import { IP_ADDRESS } from "../Functions/GetIP";
 import ProfilePicturePicker from "../Components/ProfilePicturePicker";
 
-const ProfileScreen = ({ navigation }) => {
+const ProfileScreen = ({navigation}) => {
   const [businessInfo, setBusinessInfo] = useState([]);
 
   const [showError, setShowError] = useState(false);
@@ -136,15 +136,15 @@ const ProfileScreen = ({ navigation }) => {
       const response = await axios
         .put(apiUrl, data, config)
         .then((response) => {
-          //console.log("changed ", field," successfully!");
           console.log(response);
           setIsRefreshing(false);
           fetchProfile();
         });
     } catch (error) {
-      //console.error("Error updating password:", error);
-      alert("Please make sure your old password is correct.");
+      setErrorMessage("Please enter valid passwords!");
+      setShowError(true);
       setIsRefreshing(false);
+      return 0;
     }
     return 1;
   };
@@ -168,13 +168,12 @@ const ProfileScreen = ({ navigation }) => {
       const response = await axios
         .put(apiUrl, data, config)
         .then((response) => {
-          //console.log("changed ", field," successfully!");
           console.log(response);
           setIsRefreshing(false);
           fetchProfile();
         });
     } catch (error) {
-      console.error("Error updating profile:", error);
+      console.error("Error updating profile");
       setIsRefreshing(false);
     }
   };
@@ -209,15 +208,8 @@ const ProfileScreen = ({ navigation }) => {
 
       setIsRefreshing(false);
 
-      // Add an arbitrary "isOpen" attribute to each business
-      // TODO This is temporary!!! This should be handled by the backend
-      // const updatedBusinesses = response.data.map((business) => {
-      //   business.isOpen = true;
-      //   return business;
-      // });
-      // setBusinesses(updatedBusinesses);
     } catch (error) {
-      console.error("Error fetching offers data:", error);
+      console.error("Error fetching offers data");
       setShowError(true);
       setErrorMessage("Error fetching offers!");
       setIsRefreshing(false);
@@ -225,6 +217,7 @@ const ProfileScreen = ({ navigation }) => {
   };
 
   const handleLogOut = async () => {
+
     //delete cache
     await SecureStore.deleteItemAsync("userToken");
     await SecureStore.deleteItemAsync("userID");
@@ -232,7 +225,7 @@ const ProfileScreen = ({ navigation }) => {
     await SecureStore.deleteItemAsync("closingHour");
 
     navigation.navigate("Login");
-  };
+  }
 
   useEffect(() => {
     fetchProfile();

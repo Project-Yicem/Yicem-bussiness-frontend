@@ -29,6 +29,12 @@ const styles = StyleSheet.create({
     width: "80%",
     marginBottom: 20,
   },
+  phoneContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "80%",
+    marginBottom: 20,
+  },
   timeInput: {
     flex: 1,
     marginBottom: 16,
@@ -83,6 +89,62 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginHorizontal: 5,
   },
+
+  //carousel
+  carouselItem: {
+    backgroundColor: theme.colors.primary,
+    borderRadius: 10,
+    padding: 20,
+    width: 300,
+    height: 200,
+  },
+  cardTitle: {
+    color: "#fff",
+    fontSize: 20,
+    marginBottom: 10,
+  },
+  cardText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  paginationContainer: {
+    paddingTop: 10,
+    paddingBottom: 20,
+  },
+  paginationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: theme.colors.primary, // Using theme.primary for active dot color
+    marginHorizontal: 8,
+  },
+  paginationDotInactive: {
+    backgroundColor: "white", // Inactive dots are white
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginLeft: 10, // Adjust left margin for spacing
+  },
+  dropdownContainer: {
+    flex: 1, // Make Dropdown fill available space
+    marginRight: 10, // Adjust right margin for spacing
+  },
+  dropdown: {
+    width: "100%", // Make Dropdown fill its container
+  },
+
+  centeredText:{
+    color: '#888', // Gray color for the text
+    fontSize: 16,
+    textAlign: 'center',
+    marginRight: 10,
+  }
 });
 
 export default styles;
