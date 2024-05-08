@@ -7,7 +7,14 @@ import {
   RefreshControl,
   View,
 } from "react-native";
-import { Button, Title, Card, Snackbar, Searchbar, Text } from "react-native-paper";
+import {
+  Button,
+  Title,
+  Card,
+  Snackbar,
+  Searchbar,
+  Text,
+} from "react-native-paper";
 import SaleItem from "../Components/SaleItem";
 import { theme } from "../Styles/styles";
 
@@ -17,7 +24,7 @@ import * as SecureStore from "expo-secure-store";
 import { IP_ADDRESS } from "../Functions/GetIP";
 import ReviewComponent from "../Components/ReviewComponent";
 
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from "@expo/vector-icons";
 
 const AnalyticsScreen = () => {
   const [showError, setShowError] = useState(false);
@@ -32,7 +39,7 @@ const AnalyticsScreen = () => {
 
   const [popularSales, setPopularSales] = useState([]);
 
-  const[rating,setRating] = useState(0.0);
+  const [rating, setRating] = useState(0.0);
 
   //Fetch offers
   const fetchHistory = async () => {
@@ -76,8 +83,6 @@ const AnalyticsScreen = () => {
   //fetch standing
   const fetchProfile = async () => {
     try {
-      setIsRefreshing(true);
-
       const userToken = await SecureStore.getItemAsync("userToken");
       const userID = await SecureStore.getItemAsync("userID");
       console.log(userID);
@@ -95,19 +100,19 @@ const AnalyticsScreen = () => {
 
       if (parseInt(response.headers["content-length"]) === 0) {
       } else {
-        setRating(response.data.rating ? parseFloat(response.data.rating) : 0.0);
+        setRating(
+          response.data.rating
+            ? parseFloat(response.data.rating).toFixed(1)
+            : 0.0
+        );
       }
 
       await SecureStore.setItemAsync("openingHour", response.data.openingHour);
       await SecureStore.setItemAsync("closingHour", response.data.closingHour);
-
-      setIsRefreshing(false);
-
     } catch (error) {
       // console.error("Error fetching offers data");
       setShowError(true);
       setErrorMessage("Error fetching offers!");
-      setIsRefreshing(false);
     }
   };
 
@@ -120,29 +125,37 @@ const AnalyticsScreen = () => {
     <ScrollView
       // style={styles.container}
       refreshControl={
-        <RefreshControl refreshing={isLoading} onRefresh={() => {fetchHistory();fetchProfile()}} />
+        <RefreshControl
+          refreshing={isLoading}
+          onRefresh={() => {
+            fetchHistory();
+            fetchProfile();
+          }}
+        />
       }
     >
       <View style={[styles.header, styles.line]}>
-            <View style={styles.profileContainer2}>
-                <Text style={styles.subscriberCount}>
-                    Favorited:
-                </Text> 
-                <FontAwesome name="heart" size={24} color="red" style={styles.subscriberCount}/> 
-                <Text style={styles.subscriberCount}>
-                    734
-                </Text> 
-            </View>
-            <View style={styles.profileContainer}>
-                <Text style={styles.averageRating}>
-                     Rating:
-                </Text> 
-                <FontAwesome name="star" size={24} color="#fcba03" style={styles.averageRating}/> 
-                <Text style={styles.averageRating}>
-                    {rating}
-                </Text> 
-            </View>
+        <View style={styles.profileContainer2}>
+          <Text style={styles.subscriberCount}>Favorited:</Text>
+          <FontAwesome
+            name="heart"
+            size={16}
+            color="red"
+            style={styles.subscriberCount}
+          />
+          <Text style={styles.subscriberCount}>734</Text>
         </View>
+        <View style={styles.profileContainer}>
+          <Text style={styles.averageRating}>Rating:</Text>
+          <FontAwesome
+            name="star"
+            size={16}
+            color="#fcba03"
+            style={styles.averageRating}
+          />
+          <Text style={styles.averageRating}>{rating}</Text>
+        </View>
+      </View>
       <ReviewComponent reviews={sales}></ReviewComponent>
     </ScrollView>
   );
@@ -171,19 +184,19 @@ const styles = StyleSheet.create({
   },
   EmptyInfoContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     //backgroundColor: '#f2f2f2', // Passive gray color
   },
   EmptyInfoText: {
-    color: '#888',
+    color: "#888",
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
   },
 
   profileContainer: {
     flex: 1,
-    width:"30%",
+    width: "30%",
     padding: 16,
     margin: 16,
     flexDirection: "row",
@@ -206,20 +219,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
   },
   subscriberCount: {
-    marginLeft: 5, 
+    marginLeft: 5,
   },
   averageRating: {
-    marginRight: 5, 
+    marginRight: 5,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
-    marginHorizontal:10,
-    justifyContent: "space-between", 
+    marginHorizontal: 10,
+    justifyContent: "space-between",
   },
-  line:{
-    flex:1,
+  line: {
+    flex: 1,
     borderBottomWidth: 1,
     borderBottomColor: "#E0E0E0",
   },

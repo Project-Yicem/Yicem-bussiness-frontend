@@ -41,8 +41,8 @@ export default function OffersScreen({ navigation }) {
   const [newTotalItems, setNewTotalItems] = useState(0);
   const [selectedPickupTimes, setSelectedPickupTimes] = useState([]);
 
-  const[openingTime, setOpeningTime] = useState("10:45");
-  const[closingTime, setClosingTime] = useState("16:45");
+  const [openingTime, setOpeningTime] = useState("10:45");
+  const [closingTime, setClosingTime] = useState("16:45");
 
   const InitNewItem = () => {
     setNewTitle("");
@@ -56,7 +56,6 @@ export default function OffersScreen({ navigation }) {
   const showModal = () => setModalVisible(true);
   const hideModal = () => setModalVisible(false);
 
-
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
@@ -66,11 +65,11 @@ export default function OffersScreen({ navigation }) {
 
   //get open close time
   const updateTimes = async () => {
-    setOpeningTime( await SecureStore.getItemAsync("openingHour"));
-    setClosingTime( await SecureStore.getItemAsync("closingHour"));
+    setOpeningTime(await SecureStore.getItemAsync("openingHour"));
+    setClosingTime(await SecureStore.getItemAsync("closingHour"));
 
-    console.log(closingHour,openingHour);
-  }
+    //console.log(closingHour,openingHour);
+  };
 
   //Fetch offers
   const fetchOffers = async () => {
@@ -180,7 +179,7 @@ export default function OffersScreen({ navigation }) {
     }
   };
 
-  useEffect( () => {
+  useEffect(() => {
     fetchOffers();
 
     //get open-close time
@@ -192,14 +191,13 @@ export default function OffersScreen({ navigation }) {
       setFilteredData(offers);
       return;
     }
-    if(offers.length > 0){
+    if (offers.length > 0) {
       setFilteredData(
         offers.filter((offer) =>
           offer.offerName.toLowerCase().includes(searchQuery.toLowerCase())
         )
       );
-    }
-    else{
+    } else {
       setFilteredData(offers);
       return;
     }
@@ -242,9 +240,11 @@ export default function OffersScreen({ navigation }) {
   const renderOffers = () => {
     //console.log(offers);
     if (!filteredData || filteredData.length === 0) {
-      return  <View style={styles.EmptyInfoContainer}>
-                <Text style={styles.EmptyInfoText}>No offers</Text>
-              </View>;
+      return (
+        <View style={styles.EmptyInfoContainer}>
+          <Text style={styles.EmptyInfoText}>No offers</Text>
+        </View>
+      );
     }
     try {
       return filteredData.map((item) => (
@@ -264,9 +264,12 @@ export default function OffersScreen({ navigation }) {
         />
       ));
     } catch (error) {
-      return  <View style={styles.EmptyInfoContainer}>
-                <Text style={styles.EmptyInfoText}>No offers</Text>
-              </View>;    }
+      return (
+        <View style={styles.EmptyInfoContainer}>
+          <Text style={styles.EmptyInfoText}>No offers</Text>
+        </View>
+      );
+    }
   };
 
   return (
@@ -275,7 +278,10 @@ export default function OffersScreen({ navigation }) {
         refreshControl={
           <RefreshControl
             refreshing={isOffersLoading}
-            onRefresh={() => { fetchOffers(); updateTimes();}}
+            onRefresh={() => {
+              fetchOffers();
+              updateTimes();
+            }}
           />
         }
       >
@@ -354,11 +360,7 @@ export default function OffersScreen({ navigation }) {
               </View>
             ))}
           </ScrollView>
-          <Button
-            onPress={addOffer}
-            mode="contained"
-            style={styles.button}
-          >
+          <Button onPress={addOffer} mode="contained" style={styles.button}>
             Save
           </Button>
         </Modal>
@@ -407,18 +409,18 @@ const styles = StyleSheet.create({
     //marginTop: 40,
     backgroundColor: "#ffffff",
     borderWidth: 1,
-    borderColor: theme.colors.primary, 
+    borderColor: theme.colors.primary,
   },
   EmptyInfoContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     //backgroundColor: '#f2f2f2', // Passive gray color
   },
   EmptyInfoText: {
-    color: '#888',
+    color: "#888",
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
 
